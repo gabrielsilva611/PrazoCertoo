@@ -22,6 +22,17 @@ function buscarPorId(negocioId, id) {
   return prisma.cliente.findFirst({ where: { id, negocioId } });
 }
 
+// RF06: histórico completo de acordos (com parcelas) e cobranças enviadas.
+function buscarComHistorico(negocioId, id) {
+  return prisma.cliente.findFirst({
+    where: { id, negocioId },
+    include: {
+      vendas: { include: { parcelas: { orderBy: { numero: 'asc' } } }, orderBy: { criadoEm: 'desc' } },
+      historicoCobrancas: { orderBy: { enviadoEm: 'desc' } },
+    },
+  });
+}
+
 function criar(negocioId, dados) {
   return prisma.cliente.create({ data: { ...dados, negocioId } });
 }
@@ -34,4 +45,11 @@ function desativar(negocioId, id) {
   return prisma.cliente.updateMany({ where: { id, negocioId }, data: { ativo: false } });
 }
 
-module.exports = { listarPorNegocio, buscarPorId, criar, atualizar, desativar };
+module.exports = {
+  listarPorNegocio,
+  buscarPorId,
+  buscarComHistorico,
+  criar,
+  atualizar,
+  desativar,
+};
