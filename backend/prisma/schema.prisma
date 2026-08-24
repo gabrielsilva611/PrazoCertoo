@@ -58,14 +58,15 @@ model Usuario {
 
 // RF04–RF07: cadastro de clientes e score (score é calculado no service, não persistido)
 model Cliente {
-  id        String   @id @default(uuid()) @db.Uuid
-  negocioId String   @map("negocio_id") @db.Uuid
-  nome      String   @db.VarChar(150)
-  telefone  String   @db.VarChar(20)
-  email     String?  @db.VarChar(150)
-  cpf       String?  @db.VarChar(14)
-  ativo     Boolean  @default(true)
-  criadoEm  DateTime @default(now()) @map("criado_em")
+  id          String   @id @default(uuid()) @db.Uuid
+  negocioId   String   @map("negocio_id") @db.Uuid
+  nome        String   @db.VarChar(150)
+  telefone    String   @db.VarChar(20)
+  email       String?  @db.VarChar(150)
+  cpf         String?  @db.VarChar(14)
+  observacoes String?  @map("observacoes")
+  ativo       Boolean  @default(true)
+  criadoEm    DateTime @default(now()) @map("criado_em")
 
   negocio            Usuario             @relation(fields: [negocioId], references: [id])
   vendas             Venda[]

@@ -1,5 +1,5 @@
 const { ZodError } = require('zod');
-const { AuthError } = require('../services/authService');
+const AppError = require('../lib/AppError');
 
 // Middleware de erro precisa dos 4 parâmetros — é assim que o Express o reconhece.
 function tratarErros(erro, req, res, next) {
@@ -7,7 +7,7 @@ function tratarErros(erro, req, res, next) {
     return res.status(400).json({ erro: 'Dados inválidos.', detalhes: erro.issues });
   }
 
-  if (erro instanceof AuthError) {
+  if (erro instanceof AppError) {
     return res.status(erro.status).json({ erro: erro.message });
   }
 
