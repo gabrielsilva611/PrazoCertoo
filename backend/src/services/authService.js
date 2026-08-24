@@ -2,23 +2,17 @@ const crypto = require('crypto');
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 const usuarioRepository = require('../repositories/usuarioRepository');
+const AppError = require('../lib/AppError');
 
 const CUSTO_HASH = 12; // RNF06, Seção 6.1 do RFC
 const EXPIRACAO_TOKEN = '8h'; // Seção 6.1 do RFC
-
-class AuthError extends Error {
-  constructor(mensagem, status) {
-    super(mensagem);
-    this.status = status;
-  }
-}
 
 // Cria o primeiro usuário de um negócio. O Dono é o próprio "negócio":
 // negocioId aponta pro seu próprio id (RN08, RN15 — isolamento multi-tenant).
 async function registrarDono({ nome, email, senha }) {
   const existente = await usuarioRepository.buscarPorEmail(email);
   if (existente) {
-    throw new AuthError('E-mail já cadastrado.', 409);
+    throw new AppError('E-mail já cadastrado.', 409);
   }
 
   const id = crypto.randomUUID();
@@ -43,7 +37,7 @@ async function login({ email, senha }) {
   const senhaConfere = usuario && (await bcrypt.compare(senha, usuario.senhaHash));
 
   if (!senhaConfere) {
-    throw new AuthError('E-mail ou senha incorretos.', 401);
+    throw new AppError('E-mail ou senha incorretos.', 401);
   }
 
   return montarRespostaLogin(usuario);
@@ -67,4 +61,4 @@ function montarRespostaLogin(usuario) {
   };
 }
 
-module.exports = { registrarDono, login, AuthError };
+module.exports = { registrarDono, login };
