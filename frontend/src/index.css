@@ -1,0 +1,16 @@
+@import "tailwindcss";
+
+@theme {
+  --color-brand-bg: #0b1410;
+  --color-brand-surface: #101d16;
+  --color-brand-border: #1f2e24;
+  --color-brand-text: #eaf1ec;
+  --color-brand-muted: #8ba396;
+  --color-brand-accent: #22c55e;
+  --color-brand-accent-hover: #16a34a;
+}
+
+body {
+  margin: 0;
+  font-family: system-ui, 'Segoe UI', Roboto, sans-serif;
+}
