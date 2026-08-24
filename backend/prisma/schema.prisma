@@ -3,7 +3,7 @@
 // Isolamento multi-tenant: negocioId aponta para o id do usuário Dono (RN08, RN15)
 
 generator client {
-  provider = "prisma-client"
+  provider = "prisma-client-js"
   output   = "../generated/prisma"
 }
 
