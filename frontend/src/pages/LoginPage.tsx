@@ -1,6 +1,7 @@
 import { useState, type FormEvent } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { useAuth } from '../context/AuthContext'
+import { useAuth } from '../AuthContext'
+import { FormField, estiloInput } from '../components/FormField'
 import { ApiError } from '../lib/api'
 
 const FUNCIONALIDADES = [
@@ -58,27 +59,29 @@ export function LoginPage() {
           <h1 className="text-2xl font-semibold">Bem-vindo de volta</h1>
           <p className="mt-1 text-sm text-brand-muted">Entre na sua conta para continuar</p>
 
-          <label className="mt-6 block text-xs uppercase tracking-wide text-brand-muted">
-            E-mail
-          </label>
-          <input
-            type="email"
-            required
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-            className="mt-1 w-full rounded-md border border-brand-border bg-brand-surface px-3 py-2 text-brand-text outline-none focus:border-brand-accent"
-          />
+          <div className="mt-6 flex flex-col gap-4">
+            <FormField rotulo="E-mail" id="email">
+              <input
+                id="email"
+                type="email"
+                required
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                className={estiloInput}
+              />
+            </FormField>
 
-          <label className="mt-4 block text-xs uppercase tracking-wide text-brand-muted">
-            Senha
-          </label>
-          <input
-            type="password"
-            required
-            value={senha}
-            onChange={(e) => setSenha(e.target.value)}
-            className="mt-1 w-full rounded-md border border-brand-border bg-brand-surface px-3 py-2 text-brand-text outline-none focus:border-brand-accent"
-          />
+            <FormField rotulo="Senha" id="senha">
+              <input
+                id="senha"
+                type="password"
+                required
+                value={senha}
+                onChange={(e) => setSenha(e.target.value)}
+                className={estiloInput}
+              />
+            </FormField>
+          </div>
 
           {erro && <p className="mt-4 text-sm text-red-400">{erro}</p>}
 

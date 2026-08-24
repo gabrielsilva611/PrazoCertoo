@@ -1,6 +1,7 @@
-import { useEffect, useMemo, useState, type FormEvent, type ReactNode } from 'react'
+import { useEffect, useMemo, useState, type FormEvent } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { AppLayout } from '../components/AppLayout'
+import { FormField, estiloInput } from '../components/FormField'
 import { ScoreBadge } from '../components/ScoreBadge'
 import { api, ApiError } from '../lib/api'
 import { calcularParcelasPrevia } from '../lib/parcelaPreview'
@@ -123,7 +124,7 @@ export function NovaVendaPage() {
             </div>
           )}
 
-          <Campo rotulo="Descrição do acordo" id="descricao">
+          <FormField rotulo="Descrição do acordo" id="descricao">
             <input
               id="descricao"
               value={descricao}
@@ -131,10 +132,10 @@ export function NovaVendaPage() {
               placeholder="Ex: Perfume 212 VIP Rosa"
               className={estiloInput}
             />
-          </Campo>
+          </FormField>
 
           <div className="mt-4 grid grid-cols-2 gap-4">
-            <Campo rotulo="Valor total (R$)" id="valorTotal">
+            <FormField rotulo="Valor total (R$)" id="valorTotal">
               <input
                 id="valorTotal"
                 required
@@ -143,8 +144,8 @@ export function NovaVendaPage() {
                 onChange={(e) => setValorTotal(e.target.value)}
                 className={estiloInput}
               />
-            </Campo>
-            <Campo rotulo="Número de parcelas" id="numParcelas">
+            </FormField>
+            <FormField rotulo="Número de parcelas" id="numParcelas">
               <input
                 id="numParcelas"
                 required
@@ -154,11 +155,11 @@ export function NovaVendaPage() {
                 onChange={(e) => setNumParcelas(e.target.value)}
                 className={estiloInput}
               />
-            </Campo>
+            </FormField>
           </div>
 
           <div className="mt-4 grid grid-cols-2 gap-4">
-            <Campo rotulo="Data do 1º vencimento" id="dataInicio">
+            <FormField rotulo="Data do 1º vencimento" id="dataInicio">
               <input
                 id="dataInicio"
                 required
@@ -167,8 +168,8 @@ export function NovaVendaPage() {
                 onChange={(e) => setDataInicio(e.target.value)}
                 className={estiloInput}
               />
-            </Campo>
-            <Campo rotulo="Intervalo entre parcelas" id="intervaloDias">
+            </FormField>
+            <FormField rotulo="Intervalo entre parcelas" id="intervaloDias">
               <select
                 id="intervaloDias"
                 value={intervaloDias}
@@ -181,7 +182,7 @@ export function NovaVendaPage() {
                   </option>
                 ))}
               </select>
-            </Campo>
+            </FormField>
           </div>
 
           {erro && <p className="mt-4 text-sm text-red-400">{erro}</p>}
@@ -225,19 +226,5 @@ export function NovaVendaPage() {
         </aside>
       </div>
     </AppLayout>
-  )
-}
-
-const estiloInput =
-  'mt-1 w-full rounded-md border border-brand-border bg-brand-surface px-3 py-2 text-sm outline-none focus:border-brand-accent'
-
-function Campo({ rotulo, id, children }: { rotulo: string; id: string; children: ReactNode }) {
-  return (
-    <div>
-      <label htmlFor={id} className="block text-xs uppercase tracking-wide text-brand-muted">
-        {rotulo}
-      </label>
-      {children}
-    </div>
   )
 }
