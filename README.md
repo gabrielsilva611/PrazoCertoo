@@ -7,7 +7,7 @@ Projeto de Portfólio — Engenharia de Software, Católica SC.
 ## Stack
 
 - **Backend:** Node.js + Express, Prisma ORM, PostgreSQL
-- **Frontend:** React + TypeScript + Vite, Tailwind CSS (em desenvolvimento)
+- **Frontend:** React + TypeScript + Vite, Tailwind CSS
 - **Infraestrutura:** Docker Compose, Nginx, GitHub Actions
 - **Qualidade:** Jest/Supertest (backend), Vitest (frontend), SonarCloud
 - **Observabilidade:** Prometheus + Grafana
@@ -18,19 +18,25 @@ Projeto de Portfólio — Engenharia de Software, Católica SC.
 PrazoCerto/
 ├── backend/          API REST (Node.js + Express + Prisma)
 │   ├── prisma/       Schema do banco e migrations
-│   └── src/          Código-fonte da API (em construção)
-├── frontend/         Aplicação React (em construção)
+│   └── src/          Código-fonte da API
+├── frontend/         Aplicação React (Vite + Tailwind)
 └── docs/             Documentação complementar do projeto
 ```
 
-## Como rodar o backend
+## Como rodar
 
 ```bash
+# Backend
 cd backend
 npm install
 cp .env.example .env      # preencha DATABASE_URL com sua conexão PostgreSQL
 npx prisma migrate dev    # cria as tabelas no banco
-npx prisma studio         # (opcional) explorar o banco pelo navegador
+npm run dev                # sobe a API em http://localhost:3000
+
+# Frontend (em outro terminal)
+cd frontend
+npm install
+npm run dev                # sobe em http://localhost:5173, com proxy para a API
 ```
 
 ## Modelo de dados
