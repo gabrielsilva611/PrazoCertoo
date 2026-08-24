@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useState } from 'react'
+import { Link } from 'react-router-dom'
 import { AppLayout } from '../components/AppLayout'
 import { ScoreBadge } from '../components/ScoreBadge'
 import { api, ApiError } from '../lib/api'
@@ -36,6 +37,12 @@ export function ClientesPage() {
           <h1 className="text-xl font-semibold">Clientes</h1>
           <p className="text-sm text-brand-muted">{clientes.length} clientes cadastrados</p>
         </div>
+        <Link
+          to="/clientes/novo"
+          className="rounded-md bg-brand-accent px-4 py-2 text-sm font-medium text-brand-bg hover:bg-brand-accent-hover"
+        >
+          + Novo Cliente
+        </Link>
       </div>
 
       <div className="mt-6 grid grid-cols-1 gap-4 sm:grid-cols-3">

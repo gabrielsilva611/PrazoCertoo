@@ -5,6 +5,7 @@ import { useAuth } from '../context/AuthContext'
 const ITENS_MENU = [
   { rotulo: 'Dashboard', para: '/' },
   { rotulo: 'Clientes', para: '/clientes' },
+  { rotulo: 'Vendas a Prazo', para: '/vendas' },
 ]
 
 function linkClasse({ isActive }: { isActive: boolean }) {
