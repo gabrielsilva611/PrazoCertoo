@@ -1,0 +1,14 @@
+node_modules
+dist
+coverage
+
+# Keep environment variables out of version control
+.env
+
+/generated/prisma
+
+# Tooling metadata that some CLIs auto-generate — not part of the project
+.claude
+.agents
+.windsurf
+skills-lock.json

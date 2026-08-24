@@ -1,0 +1,634 @@
+<title>Reta Final PrazoCerto</title>
+
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600&family=Source+Sans+3:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap');
+
+  :root {
+    --bg: #f6f8f4;
+    --surface: #ffffff;
+    --surface-2: #eef2ea;
+    --ink: #1a231d;
+    --ink-muted: #57685d;
+    --ink-faint: #8a988e;
+    --line: #dde4d8;
+    --accent: #1f7a5c;
+    --accent-ink: #ffffff;
+    --accent-soft: #e2f0e7;
+    --amber: #a8641f;
+    --amber-soft: #f7ecdc;
+    --shadow: 0 1px 2px rgba(26,35,29,0.04), 0 8px 24px -12px rgba(26,35,29,0.12);
+  }
+
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --bg: #10160f;
+      --surface: #171f15;
+      --surface-2: #1f2a1c;
+      --ink: #eaf1e4;
+      --ink-muted: #a4b39a;
+      --ink-faint: #6d7d66;
+      --line: #2b3826;
+      --accent: #57cb92;
+      --accent-ink: #0c1a12;
+      --accent-soft: #1c3226;
+      --amber: #e0a45b;
+      --amber-soft: #33291a;
+      --shadow: 0 1px 2px rgba(0,0,0,0.3), 0 8px 24px -12px rgba(0,0,0,0.5);
+    }
+  }
+
+  :root[data-theme="dark"] {
+    --bg: #10160f;
+    --surface: #171f15;
+    --surface-2: #1f2a1c;
+    --ink: #eaf1e4;
+    --ink-muted: #a4b39a;
+    --ink-faint: #6d7d66;
+    --line: #2b3826;
+    --accent: #57cb92;
+    --accent-ink: #0c1a12;
+    --accent-soft: #1c3226;
+    --amber: #e0a45b;
+    --amber-soft: #33291a;
+    --shadow: 0 1px 2px rgba(0,0,0,0.3), 0 8px 24px -12px rgba(0,0,0,0.5);
+  }
+
+  * { box-sizing: border-box; }
+
+  body {
+    margin: 0;
+    background: var(--bg);
+    color: var(--ink);
+    font-family: 'Source Sans 3', ui-sans-serif, system-ui, sans-serif;
+    line-height: 1.5;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  .wrap {
+    max-width: 880px;
+    margin: 0 auto;
+    padding: 56px 24px 96px;
+  }
+
+  .eyebrow {
+    font-family: 'JetBrains Mono', ui-monospace, monospace;
+    font-size: 0.78rem;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--accent);
+    font-weight: 600;
+  }
+
+  h1 {
+    font-family: 'Fraunces', Georgia, serif;
+    font-weight: 600;
+    font-size: clamp(2rem, 4.5vw, 2.9rem);
+    line-height: 1.08;
+    letter-spacing: -0.01em;
+    margin: 0.4em 0 0.3em;
+    text-wrap: balance;
+  }
+
+  .lede {
+    font-size: 1.08rem;
+    color: var(--ink-muted);
+    max-width: 62ch;
+    margin: 0 0 8px;
+  }
+
+  .meta-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin-top: 20px;
+  }
+
+  .pill {
+    font-family: 'JetBrains Mono', ui-monospace, monospace;
+    font-size: 0.8rem;
+    font-weight: 500;
+    padding: 6px 12px;
+    border-radius: 999px;
+    background: var(--surface-2);
+    color: var(--ink-muted);
+    border: 1px solid var(--line);
+    font-variant-numeric: tabular-nums;
+  }
+
+  .pill strong { color: var(--ink); font-weight: 600; }
+
+  /* Rail */
+  .rail {
+    margin: 40px 0 8px;
+    padding: 20px 22px;
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-radius: 14px;
+    box-shadow: var(--shadow);
+    overflow-x: auto;
+  }
+
+  .rail-track {
+    display: flex;
+    align-items: flex-start;
+    gap: 0;
+    min-width: 620px;
+  }
+
+  .rail-stop {
+    flex: 1;
+    position: relative;
+    text-align: center;
+    padding-top: 22px;
+  }
+
+  .rail-stop::before {
+    content: "";
+    position: absolute;
+    top: 6px;
+    left: 0;
+    right: 0;
+    height: 2px;
+    background: var(--line);
+  }
+
+  .rail-stop:first-child::before { left: 50%; }
+  .rail-stop:last-child::before { right: 50%; }
+
+  .rail-dot {
+    position: absolute;
+    top: -1px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    background: var(--surface);
+    border: 2px solid var(--ink-faint);
+  }
+
+  .rail-stop.is-milestone .rail-dot {
+    background: var(--accent);
+    border-color: var(--accent);
+    width: 12px;
+    height: 12px;
+    top: -2px;
+  }
+
+  .rail-stop.is-now .rail-dot {
+    background: var(--amber);
+    border-color: var(--amber);
+  }
+
+  .rail-label {
+    font-size: 0.72rem;
+    font-weight: 600;
+    color: var(--ink);
+  }
+
+  .rail-date {
+    font-family: 'JetBrains Mono', ui-monospace, monospace;
+    font-size: 0.68rem;
+    color: var(--ink-faint);
+    margin-top: 2px;
+    font-variant-numeric: tabular-nums;
+  }
+
+  /* Callouts */
+  .callout {
+    margin: 28px 0;
+    padding: 16px 18px;
+    border-radius: 10px;
+    border: 1px solid var(--line);
+    background: var(--surface);
+    display: flex;
+    gap: 12px;
+  }
+
+  .callout.amber {
+    background: var(--amber-soft);
+    border-color: color-mix(in srgb, var(--amber) 35%, var(--line));
+  }
+
+  .callout-icon {
+    font-family: 'JetBrains Mono', monospace;
+    font-weight: 700;
+    font-size: 0.78rem;
+    color: var(--amber);
+    flex-shrink: 0;
+    padding-top: 2px;
+  }
+
+  .callout p {
+    margin: 0;
+    font-size: 0.94rem;
+    color: var(--ink);
+  }
+
+  .callout p + p { margin-top: 6px; }
+  .callout strong { color: var(--ink); }
+
+  /* Timeline of sprints */
+  .timeline {
+    margin-top: 44px;
+    position: relative;
+  }
+
+  .timeline::before {
+    content: "";
+    position: absolute;
+    left: 27px;
+    top: 8px;
+    bottom: 8px;
+    width: 2px;
+    background: var(--line);
+  }
+
+  .entry {
+    position: relative;
+    padding-left: 68px;
+    margin-bottom: 36px;
+  }
+
+  .entry-marker {
+    position: absolute;
+    left: 0;
+    top: 2px;
+    width: 56px;
+    height: 56px;
+    border-radius: 50%;
+    background: var(--surface);
+    border: 2px solid var(--line);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: 'JetBrains Mono', monospace;
+    font-weight: 600;
+    font-size: 0.85rem;
+    color: var(--ink-muted);
+    z-index: 1;
+  }
+
+  .entry.is-milestone .entry-marker {
+    background: var(--accent);
+    border-color: var(--accent);
+    color: var(--accent-ink);
+  }
+
+  .entry-head {
+    display: flex;
+    align-items: baseline;
+    gap: 12px;
+    flex-wrap: wrap;
+    margin-bottom: 4px;
+  }
+
+  .entry-date {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.78rem;
+    color: var(--ink-faint);
+    font-variant-numeric: tabular-nums;
+  }
+
+  .entry h2 {
+    font-family: 'Fraunces', Georgia, serif;
+    font-weight: 600;
+    font-size: 1.32rem;
+    margin: 0;
+    color: var(--ink);
+  }
+
+  .entry.is-milestone h2 { color: var(--accent); }
+
+  .card {
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-radius: 12px;
+    box-shadow: var(--shadow);
+    padding: 16px 18px;
+    margin-top: 10px;
+  }
+
+  .card + .card { margin-top: 10px; }
+
+  .card-label {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.7rem;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    font-weight: 600;
+    margin: 0 0 8px;
+  }
+
+  .card.portfolio .card-label { color: var(--accent); }
+  .card.pac .card-label { color: var(--amber); }
+
+  .card ul {
+    margin: 0;
+    padding-left: 18px;
+  }
+
+  .card li {
+    font-size: 0.94rem;
+    margin-bottom: 5px;
+    color: var(--ink);
+  }
+
+  .card li:last-child { margin-bottom: 0; }
+
+  .milestone-body {
+    font-size: 0.96rem;
+    color: var(--ink-muted);
+    max-width: 62ch;
+  }
+
+  .milestone-weight {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.78rem;
+    color: var(--accent);
+    font-weight: 600;
+  }
+
+  footer {
+    margin-top: 56px;
+    padding-top: 20px;
+    border-top: 1px solid var(--line);
+    font-size: 0.82rem;
+    color: var(--ink-faint);
+  }
+
+  footer p { margin: 4px 0; }
+
+  @media (max-width: 560px) {
+    .entry { padding-left: 56px; }
+    .entry-marker { width: 44px; height: 44px; font-size: 0.72rem; }
+    .timeline::before { left: 21px; }
+  }
+</style>
+
+<div class="wrap">
+
+  <div class="eyebrow">PrazoCerto · Portfólio + PAC Extensionista VIII</div>
+  <h1>Cronograma até a entrega final</h1>
+  <p class="lede">De hoje até o release em produção: o que falta do desenvolvimento técnico (Portfólio) entrelaçado com o ciclo de qualidade e validação (PAC VIII) — peer review em squad e validação com Joinville Perfumes e a distribuidora local.</p>
+
+  <div class="meta-row">
+    <span class="pill">Hoje → <strong>24/08/2026</strong></span>
+    <span class="pill">NP1 (20%) → <strong>~22/09</strong></span>
+    <span class="pill">NP2 (20%) → <strong>~03/11</strong></span>
+    <span class="pill">NP3 (60%) → <strong>30/11/2026</strong></span>
+    <span class="pill">Demo Day → <strong>10, 15, 16/12</strong></span>
+  </div>
+
+  <div class="rail">
+    <div class="rail-track">
+      <div class="rail-stop is-now">
+        <span class="rail-dot"></span>
+        <div class="rail-label">Hoje</div>
+        <div class="rail-date">24/08</div>
+      </div>
+      <div class="rail-stop">
+        <span class="rail-dot"></span>
+        <div class="rail-label">Sprints 1–2</div>
+        <div class="rail-date">até 21/09</div>
+      </div>
+      <div class="rail-stop is-milestone">
+        <span class="rail-dot"></span>
+        <div class="rail-label">NP1</div>
+        <div class="rail-date">~22/09</div>
+      </div>
+      <div class="rail-stop">
+        <span class="rail-dot"></span>
+        <div class="rail-label">Sprints 3–5</div>
+        <div class="rail-date">até 02/11</div>
+      </div>
+      <div class="rail-stop is-milestone">
+        <span class="rail-dot"></span>
+        <div class="rail-label">NP2</div>
+        <div class="rail-date">~03/11</div>
+      </div>
+      <div class="rail-stop">
+        <span class="rail-dot"></span>
+        <div class="rail-label">Sprints 6–7</div>
+        <div class="rail-date">até 29/11</div>
+      </div>
+      <div class="rail-stop is-milestone">
+        <span class="rail-dot"></span>
+        <div class="rail-label">NP3 · Entrega</div>
+        <div class="rail-date">30/11</div>
+      </div>
+      <div class="rail-stop is-milestone">
+        <span class="rail-dot"></span>
+        <div class="rail-label">Demo Day</div>
+        <div class="rail-date">10–16/12</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="callout amber">
+    <span class="callout-icon">!</span>
+    <div>
+      <p><strong>Datas de NP1 e NP2 são estimativas</strong> — dividi o tempo entre hoje e a entrega final (30/11) em três blocos iguais, já que essas datas ficam no calendário oficial da faculdade. Confirme com o professor e ajuste as datas abaixo assim que souber as reais.</p>
+      <p><strong>Modalidade sugerida: Comunidade.</strong> O RFC não cita parceiro corporativo — as evidências são com Joinville Perfumes e a distribuidora local, dois negócios reais sem termo de parceria formal. Isso se encaixa na Seção 3.1 do PAC VIII (sem termo de aceite, com relatório de validação + declaração da comunidade). Se ainda não declarou a modalidade ao professor, faça isso primeiro — antes mesmo do Sprint 1.</p>
+    </div>
+  </div>
+
+  <div class="timeline">
+
+    <div class="entry">
+      <div class="entry-marker">S1</div>
+      <div class="entry-head">
+        <h2>Retomada e formação da squad</h2>
+        <span class="entry-date">25/08 – 07/09</span>
+      </div>
+      <div class="card portfolio">
+        <p class="card-label">Portfólio · técnico</p>
+        <ul>
+          <li>Concluir o Dashboard Gerencial (S7–S8 do RFC): KPIs unificados de recebimento e estoque, RBAC completo</li>
+          <li>Iniciar o Módulo de Produtos (S9–S10): cadastro de categorias, produtos e fornecedores</li>
+        </ul>
+      </div>
+      <div class="card pac">
+        <p class="card-label">PAC VIII · qualidade e extensão</p>
+        <ul>
+          <li>Declarar a modalidade (Comunidade) ao professor</li>
+          <li>Formar a squad de validação (3 a 5 colegas) e combinar a rotina de PRs cruzados</li>
+          <li>Abrir os primeiros Pull Requests para revisão dos colegas</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="entry">
+      <div class="entry-marker">S2</div>
+      <div class="entry-head">
+        <h2>Primeiro ciclo de revisão e validação</h2>
+        <span class="entry-date">08/09 – 21/09</span>
+      </div>
+      <div class="card portfolio">
+        <p class="card-label">Portfólio · técnico</p>
+        <ul>
+          <li>Concluir o Módulo de Produtos: entradas/saídas, débito automático no fluxo de vendas, capital imobilizado, alertas de reposição</li>
+        </ul>
+      </div>
+      <div class="card pac">
+        <p class="card-label">PAC VIII · qualidade e extensão</p>
+        <ul>
+          <li>Primeira rodada de code review nos repositórios dos colegas + issues de bugs encontrados</li>
+          <li>Sessão 1 de validação com usuário real (Joinville Perfumes ou distribuidora) sobre o MVP atual — registrar data, o que foi testado e o que foi apontado</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="entry is-milestone">
+      <div class="entry-marker">NP1</div>
+      <div class="entry-head">
+        <h2>Ciclo de Qualidade Inicial</h2>
+        <span class="entry-date">~22/09 · <span class="milestone-weight">20% da nota</span></span>
+      </div>
+      <p class="milestone-body">Entregar: evidências de code review e issues nos repositórios dos colegas, e o relatório da primeira sessão de validação com o parceiro/comunidade.</p>
+    </div>
+
+    <div class="entry">
+      <div class="entry-marker">S3</div>
+      <div class="entry-head">
+        <h2>Inventário físico</h2>
+        <span class="entry-date">22/09 – 05/10</span>
+      </div>
+      <div class="card portfolio">
+        <p class="card-label">Portfólio · técnico</p>
+        <ul>
+          <li>S11–S12 do RFC: inventário físico com registro de divergências e justificativa</li>
+          <li>Relatórios de estoque: produtos mais vendidos, exportação em PDF</li>
+        </ul>
+      </div>
+      <div class="card pac">
+        <p class="card-label">PAC VIII · qualidade e extensão</p>
+        <ul>
+          <li>Continuar revisão cruzada — novas issues conforme o módulo de estoque cresce</li>
+          <li>Sessão 2 de validação com a comunidade, focada no módulo de estoque</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="entry">
+      <div class="entry-marker">S4</div>
+      <div class="entry-head">
+        <h2>Qualidade e segurança I</h2>
+        <span class="entry-date">06/10 – 19/10</span>
+      </div>
+      <div class="card portfolio">
+        <p class="card-label">Portfólio · técnico</p>
+        <ul>
+          <li>S13–S14 do RFC: cobertura de testes rumo a ≥75% backend (TDD) e ≥25% frontend</li>
+          <li>Início da revisão OWASP Top 10 nos módulos entregues</li>
+        </ul>
+      </div>
+      <div class="card pac">
+        <p class="card-label">PAC VIII · qualidade e extensão</p>
+        <ul>
+          <li>Verificar se os bugs reportados pelos colegas nos Sprints 2–3 foram corrigidos</li>
+          <li>Sessão 3 de validação com a comunidade — fecha o mínimo de 3 sessões documentadas exigido na modalidade Comunidade</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="entry">
+      <div class="entry-marker">S5</div>
+      <div class="entry-head">
+        <h2>Qualidade e segurança II</h2>
+        <span class="entry-date">20/10 – 02/11</span>
+      </div>
+      <div class="card portfolio">
+        <p class="card-label">Portfólio · técnico</p>
+        <ul>
+          <li>Fechar SonarCloud sem issues bloqueantes; testes de integração dos dois módulos</li>
+          <li>Ajustes finais de segurança (rate limiting, headers, hardening dos containers)</li>
+        </ul>
+      </div>
+      <div class="card pac">
+        <p class="card-label">PAC VIII · qualidade e extensão</p>
+        <ul>
+          <li>Demo das melhorias implementadas a partir do feedback das sessões 1–3</li>
+          <li>Consolidar a declaração da comunidade atendida (carta, e-mail ou registro do representante)</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="entry is-milestone">
+      <div class="entry-marker">NP2</div>
+      <div class="entry-head">
+        <h2>Ciclo de Evolução e Refinamento</h2>
+        <span class="entry-date">~03/11 · <span class="milestone-weight">20% da nota</span></span>
+      </div>
+      <p class="milestone-body">Entregar: verificação de que os bugs reportados pelos colegas foram corrigidos, e a demonstração das melhorias implementadas com base no feedback anterior do parceiro/comunidade.</p>
+    </div>
+
+    <div class="entry">
+      <div class="entry-marker">S6</div>
+      <div class="entry-head">
+        <h2>Deploy em produção</h2>
+        <span class="entry-date">03/11 – 16/11</span>
+      </div>
+      <div class="card portfolio">
+        <p class="card-label">Portfólio · técnico</p>
+        <ul>
+          <li>S15–S16 do RFC: deploy com domínio público, Docker Compose em produção, PWA instalável</li>
+          <li>Prometheus + Grafana ativos com dashboards de observabilidade</li>
+        </ul>
+      </div>
+      <div class="card pac">
+        <p class="card-label">PAC VIII · qualidade e extensão</p>
+        <ul>
+          <li>Últimas correções decorrentes do feedback, rastreáveis em issues e commits</li>
+          <li>Reunir os PRs, issues e relatórios em um só lugar para a entrega final</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="entry">
+      <div class="entry-marker">S7</div>
+      <div class="entry-head">
+        <h2>Fechamento</h2>
+        <span class="entry-date">17/11 – 29/11</span>
+      </div>
+      <div class="card portfolio">
+        <p class="card-label">Portfólio · técnico</p>
+        <ul>
+          <li>Congelamento de escopo, últimos bugs, documentação técnica final (RFC atualizado)</li>
+        </ul>
+      </div>
+      <div class="card pac">
+        <p class="card-label">PAC VIII · qualidade e extensão</p>
+        <ul>
+          <li>Revisão final de todas as evidências: PRs, issues, relatório de validação (3+ sessões), declaração da comunidade</li>
+          <li>Preparar o material de socialização — como a solução volta para Joinville Perfumes e a distribuidora</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="entry is-milestone">
+      <div class="entry-marker">NP3</div>
+      <div class="entry-head">
+        <h2>Entrega Final Integrada</h2>
+        <span class="entry-date">30/11/2026 · <span class="milestone-weight">60% da nota</span></span>
+      </div>
+      <p class="milestone-body">Software em versão release + evidências de peer review completas + evidências equivalentes da modalidade Comunidade (relatório de validação, feedback documentado, declaração da comunidade, correções rastreáveis).</p>
+    </div>
+
+    <div class="entry is-milestone">
+      <div class="entry-marker">🎤</div>
+      <div class="entry-head">
+        <h2>Poster + Demo Day</h2>
+        <span class="entry-date">10, 15 e 16/12/2026</span>
+      </div>
+      <p class="milestone-body">Portfólio avalia produto e apresentação técnica. O PAC VIII avalia a dimensão extensionista: o que Joinville Perfumes e a distribuidora efetivamente receberam, validaram e passaram a usar — não a apresentação técnica em si.</p>
+    </div>
+
+  </div>
+
+  <footer>
+    <p>Baseado no RFC v1.0 do PrazoCerto (abril/2026) e no programa do PAC Extensionista VIII.</p>
+    <p>Datas de NP1 e NP2 são estimativas — substitua pelas datas oficiais do calendário 2026/2 assim que confirmadas com o professor.</p>
+  </footer>
+
+</div>

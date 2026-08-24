@@ -1,0 +1,244 @@
+// PrazoCerto — Schema do banco de dados
+// Modelado a partir do RFC v1.0, Seção 5.5 (Modelo de Dados) e Figura 35 (ERD)
+// Isolamento multi-tenant: negocioId aponta para o id do usuário Dono (RN08, RN15)
+
+generator client {
+  provider = "prisma-client"
+  output   = "../generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+enum Perfil {
+  DONO
+  FUNCIONARIO
+}
+
+enum TipoMovimentacao {
+  ENTRADA
+  SAIDA
+  AJUSTE
+  INVENTARIO
+}
+
+enum StatusInventario {
+  ABERTO
+  CONCLUIDO
+}
+
+// ───────────────────────── Módulo Comercial ─────────────────────────
+
+// RF01–RF03: autenticação e RBAC (DONO acesso total, FUNCIONARIO restrito)
+model Usuario {
+  id        String   @id @default(uuid()) @db.Uuid
+  negocioId String   @map("negocio_id") @db.Uuid
+  nome      String   @db.VarChar(150)
+  email     String   @unique @db.VarChar(150)
+  senhaHash String   @map("senha_hash") @db.VarChar(255)
+  perfil    Perfil
+  criadoEm  DateTime @default(now()) @map("criado_em")
+
+  negocio Usuario   @relation("NegocioEquipe", fields: [negocioId], references: [id])
+  equipe  Usuario[] @relation("NegocioEquipe")
+
+  clientes             Cliente[]
+  vendas               Venda[]
+  historicoCobrancas   HistoricoCobranca[]
+  categorias           Categoria[]
+  fornecedores         Fornecedor[]
+  produtos             Produto[]
+  movimentacoesEstoque MovimentacaoEstoque[]
+  inventarios          Inventario[]
+
+  @@index([negocioId])
+  @@map("usuarios")
+}
+
+// RF04–RF07: cadastro de clientes e score (score é calculado no service, não persistido)
+model Cliente {
+  id        String   @id @default(uuid()) @db.Uuid
+  negocioId String   @map("negocio_id") @db.Uuid
+  nome      String   @db.VarChar(150)
+  telefone  String   @db.VarChar(20)
+  email     String?  @db.VarChar(150)
+  cpf       String?  @db.VarChar(14)
+  ativo     Boolean  @default(true)
+  criadoEm  DateTime @default(now()) @map("criado_em")
+
+  negocio            Usuario             @relation(fields: [negocioId], references: [id])
+  vendas             Venda[]
+  historicoCobrancas HistoricoCobranca[]
+
+  @@index([negocioId])
+  @@map("clientes")
+}
+
+// RF08–RF10: registro de vendas a prazo, com produto opcional (integra com o estoque)
+model Venda {
+  id          String   @id @default(uuid()) @db.Uuid
+  negocioId   String   @map("negocio_id") @db.Uuid
+  clienteId   String   @map("cliente_id") @db.Uuid
+  produtoId   String?  @map("produto_id") @db.Uuid
+  descricao   String?  @db.VarChar(255)
+  observacoes String?
+  valorTotal  Decimal  @map("valor_total") @db.Decimal(10, 2)
+  numParcelas Int      @map("num_parcelas")
+  dataInicio  DateTime @map("data_inicio") @db.Date
+  criadoEm    DateTime @default(now()) @map("criado_em")
+
+  negocio  Usuario   @relation(fields: [negocioId], references: [id])
+  cliente  Cliente   @relation(fields: [clienteId], references: [id])
+  produto  Produto?  @relation(fields: [produtoId], references: [id])
+  parcelas Parcela[]
+
+  @@index([negocioId])
+  @@index([clienteId])
+  @@map("vendas")
+}
+
+// RF09, RF11, RF12, RN01: parcelas calculadas automaticamente; status é derivado
+// (PAGO se pagoEm != null; ATRASADO se pagoEm == null e vencimento < hoje; senão PENDENTE)
+model Parcela {
+  id         String    @id @default(uuid()) @db.Uuid
+  vendaId    String    @map("venda_id") @db.Uuid
+  numero     Int
+  valor      Decimal   @db.Decimal(10, 2)
+  vencimento DateTime  @db.Date
+  pagoEm     DateTime? @map("pago_em")
+
+  venda              Venda               @relation(fields: [vendaId], references: [id])
+  historicoCobrancas HistoricoCobranca[]
+
+  @@index([vendaId])
+  @@index([vencimento])
+  @@map("parcelas")
+}
+
+// RF13–RF15, RN07: histórico imutável de cobranças via WhatsApp
+model HistoricoCobranca {
+  id        String   @id @default(uuid()) @db.Uuid
+  negocioId String   @map("negocio_id") @db.Uuid
+  clienteId String   @map("cliente_id") @db.Uuid
+  parcelaId String?  @map("parcela_id") @db.Uuid
+  mensagem  String
+  canal     String   @db.VarChar(30)
+  enviadoEm DateTime @default(now()) @map("enviado_em")
+
+  negocio Usuario  @relation(fields: [negocioId], references: [id])
+  cliente Cliente  @relation(fields: [clienteId], references: [id])
+  parcela Parcela? @relation(fields: [parcelaId], references: [id])
+
+  @@index([clienteId])
+  @@map("historico_cobrancas")
+}
+
+// ───────────────────────── Módulo de Estoque ─────────────────────────
+
+// RF20: agrupamento de produtos por tipo
+model Categoria {
+  id        String  @id @default(uuid()) @db.Uuid
+  negocioId String  @map("negocio_id") @db.Uuid
+  nome      String  @db.VarChar(100)
+  descricao String?
+
+  negocio  Usuario   @relation(fields: [negocioId], references: [id])
+  produtos Produto[]
+
+  @@index([negocioId])
+  @@map("categorias")
+}
+
+// RF22: cadastro opcional, vinculado às entradas de estoque
+model Fornecedor {
+  id        String  @id @default(uuid()) @db.Uuid
+  negocioId String  @map("negocio_id") @db.Uuid
+  nome      String  @db.VarChar(150)
+  contato   String? @db.VarChar(100)
+
+  negocio       Usuario               @relation(fields: [negocioId], references: [id])
+  movimentacoes MovimentacaoEstoque[]
+
+  @@index([negocioId])
+  @@map("fornecedores")
+}
+
+// RF21, RF27: catálogo de produtos com saldo e capital imobilizado (custo × saldo, calculado no service)
+model Produto {
+  id            String  @id @default(uuid()) @db.Uuid
+  negocioId     String  @map("negocio_id") @db.Uuid
+  categoriaId   String? @map("categoria_id") @db.Uuid
+  nome          String  @db.VarChar(150)
+  unidade       String  @db.VarChar(20)
+  precoCusto    Decimal @map("preco_custo") @db.Decimal(10, 2)
+  precoVenda    Decimal @map("preco_venda") @db.Decimal(10, 2)
+  saldoAtual    Int     @default(0) @map("saldo_atual")
+  estoqueMinimo Int     @map("estoque_minimo")
+  ativo         Boolean @default(true)
+
+  negocio         Usuario               @relation(fields: [negocioId], references: [id])
+  categoria       Categoria?            @relation(fields: [categoriaId], references: [id])
+  vendas          Venda[]
+  movimentacoes   MovimentacaoEstoque[]
+  itensInventario InventarioItem[]
+
+  @@index([negocioId])
+  @@index([categoriaId])
+  @@map("produtos")
+}
+
+// RF23–RF26, RN12: histórico imutável — nenhum registro pode ser editado ou excluído
+model MovimentacaoEstoque {
+  id             String           @id @default(uuid()) @db.Uuid
+  produtoId      String           @map("produto_id") @db.Uuid
+  usuarioId      String           @map("usuario_id") @db.Uuid
+  fornecedorId   String?          @map("fornecedor_id") @db.Uuid
+  tipo           TipoMovimentacao
+  quantidade     Int
+  saldoAnterior  Int              @map("saldo_anterior")
+  saldoPosterior Int              @map("saldo_posterior")
+  motivo         String?
+  criadoEm       DateTime         @default(now()) @map("criado_em")
+
+  produto    Produto     @relation(fields: [produtoId], references: [id])
+  usuario    Usuario     @relation(fields: [usuarioId], references: [id])
+  fornecedor Fornecedor? @relation(fields: [fornecedorId], references: [id])
+
+  @@index([produtoId])
+  @@index([criadoEm])
+  @@map("movimentacoes_estoque")
+}
+
+// RF28, RN13: inventário físico — só o perfil Dono realiza
+model Inventario {
+  id          String           @id @default(uuid()) @db.Uuid
+  negocioId   String           @map("negocio_id") @db.Uuid
+  usuarioId   String           @map("usuario_id") @db.Uuid
+  status      StatusInventario @default(ABERTO)
+  iniciadoEm  DateTime         @default(now()) @map("iniciado_em")
+  concluidoEm DateTime?        @map("concluido_em")
+
+  negocio Usuario          @relation(fields: [negocioId], references: [id])
+  itens   InventarioItem[]
+
+  @@index([negocioId])
+  @@map("inventarios")
+}
+
+// Itens conferidos em cada inventário, com a divergência já calculada
+model InventarioItem {
+  id            String  @id @default(uuid()) @db.Uuid
+  inventarioId  String  @map("inventario_id") @db.Uuid
+  produtoId     String  @map("produto_id") @db.Uuid
+  saldoSistema  Int     @map("saldo_sistema")
+  saldoFisico   Int     @map("saldo_fisico")
+  diferenca     Int
+  justificativa String?
+
+  inventario Inventario @relation(fields: [inventarioId], references: [id])
+  produto    Produto    @relation(fields: [produtoId], references: [id])
+
+  @@index([inventarioId])
+  @@map("inventario_itens")
+}
