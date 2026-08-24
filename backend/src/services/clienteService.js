@@ -1,6 +1,7 @@
 const clienteRepository = require('../repositories/clienteRepository');
 const scoreService = require('./scoreService');
 const AppError = require('../lib/AppError');
+const { statusParcela } = require('../lib/parcelaUtil');
 
 // RF04, RF07: lista clientes ativos do negócio com o score calculado em tempo real.
 async function listar(negocioId, { busca, incluirInativos } = {}) {
@@ -13,12 +14,20 @@ async function listar(negocioId, { busca, incluirInativos } = {}) {
   );
 }
 
-// RF06: detalhe do cliente com score. O histórico de acordos e cobranças
-// (Módulos 3 e 4) se conecta aqui quando esses módulos existirem.
+// RF06: detalhe do cliente com score, acordos (com parcelas) e cobranças enviadas.
 async function buscarDetalhe(negocioId, id) {
-  const cliente = await buscarOuFalhar(negocioId, id);
+  const cliente = await clienteRepository.buscarComHistorico(negocioId, id);
+  if (!cliente) {
+    throw new AppError('Cliente não encontrado.', 404);
+  }
+
   const score = await scoreService.calcularScore(cliente.id);
-  return { ...cliente, score };
+  const vendas = cliente.vendas.map((venda) => ({
+    ...venda,
+    parcelas: venda.parcelas.map((parcela) => ({ ...parcela, status: statusParcela(parcela) })),
+  }));
+
+  return { ...cliente, vendas, score };
 }
 
 async function criar(negocioId, dados) {
