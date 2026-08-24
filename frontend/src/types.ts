@@ -25,3 +25,27 @@ export interface Cliente {
   score: Score
   criadoEm: string
 }
+
+export type StatusParcela = 'PENDENTE' | 'PAGO' | 'ATRASADO'
+
+export interface Parcela {
+  id: string
+  numero: number
+  valor: string
+  vencimento: string
+  pagoEm: string | null
+  status: StatusParcela
+}
+
+export interface Venda {
+  id: string
+  clienteId: string
+  cliente?: Cliente
+  descricao: string | null
+  observacoes: string | null
+  valorTotal: string
+  numParcelas: number
+  dataInicio: string
+  criadoEm: string
+  parcelas: Parcela[]
+}
