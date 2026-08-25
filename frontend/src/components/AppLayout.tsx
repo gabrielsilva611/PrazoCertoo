@@ -1,6 +1,6 @@
 import { type ReactNode } from 'react'
 import { NavLink } from 'react-router-dom'
-import { useAuth } from '../context/AuthContext'
+import { useAuth } from '../AuthContext'
 
 const ITENS_MENU = [
   { rotulo: 'Dashboard', para: '/' },

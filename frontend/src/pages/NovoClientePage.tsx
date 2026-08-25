@@ -1,6 +1,7 @@
-import { useState, type FormEvent, type ReactNode } from 'react'
+import { useState, type FormEvent } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { AppLayout } from '../components/AppLayout'
+import { FormField, estiloInput } from '../components/FormField'
 import { api, ApiError } from '../lib/api'
 import type { Cliente } from '../types'
 
@@ -39,51 +40,55 @@ export function NovoClientePage() {
       <h1 className="text-xl font-semibold">Novo Cliente</h1>
       <p className="text-sm text-brand-muted">Preencha as informações para cadastrar o cliente</p>
 
-      <form onSubmit={aoSubmeter} className="mt-6 max-w-lg">
-        <Campo rotulo="Nome completo" obrigatorio>
+      <form onSubmit={aoSubmeter} className="mt-6 flex max-w-lg flex-col gap-4">
+        <FormField rotulo="Nome completo" id="nome" obrigatorio>
           <input
+            id="nome"
             required
             value={nome}
             onChange={(e) => setNome(e.target.value)}
             className={estiloInput}
           />
-        </Campo>
+        </FormField>
 
-        <Campo rotulo="Telefone / WhatsApp" obrigatorio>
+        <FormField rotulo="Telefone / WhatsApp" id="telefone" obrigatorio>
           <input
+            id="telefone"
             required
             value={telefone}
             onChange={(e) => setTelefone(e.target.value)}
             placeholder="(47) 99999-9999"
             className={estiloInput}
           />
-        </Campo>
+        </FormField>
 
-        <Campo rotulo="E-mail">
+        <FormField rotulo="E-mail" id="email">
           <input
+            id="email"
             type="email"
             value={email}
             onChange={(e) => setEmail(e.target.value)}
             className={estiloInput}
           />
-        </Campo>
+        </FormField>
 
-        <Campo rotulo="CPF">
-          <input value={cpf} onChange={(e) => setCpf(e.target.value)} className={estiloInput} />
-        </Campo>
+        <FormField rotulo="CPF" id="cpf">
+          <input id="cpf" value={cpf} onChange={(e) => setCpf(e.target.value)} className={estiloInput} />
+        </FormField>
 
-        <Campo rotulo="Observações internas">
+        <FormField rotulo="Observações internas" id="observacoes">
           <textarea
+            id="observacoes"
             value={observacoes}
             onChange={(e) => setObservacoes(e.target.value)}
             rows={3}
             className={estiloInput}
           />
-        </Campo>
+        </FormField>
 
-        {erro && <p className="mt-2 text-sm text-red-400">{erro}</p>}
+        {erro && <p className="text-sm text-red-400">{erro}</p>}
 
-        <div className="mt-6 flex gap-3">
+        <div className="flex gap-3">
           <button
             type="submit"
             disabled={salvando}
@@ -101,25 +106,5 @@ export function NovoClientePage() {
         </div>
       </form>
     </AppLayout>
-  )
-}
-
-const estiloInput =
-  'mt-1 w-full rounded-md border border-brand-border bg-brand-surface px-3 py-2 text-sm outline-none focus:border-brand-accent'
-
-function Campo({
-  rotulo,
-  obrigatorio,
-  children,
-}: {
-  rotulo: string
-  obrigatorio?: boolean
-  children: ReactNode
-}) {
-  return (
-    <label className="mt-4 block text-xs uppercase tracking-wide text-brand-muted first:mt-0">
-      {rotulo} {obrigatorio && <span className="text-brand-accent">*</span>}
-      {children}
-    </label>
   )
 }
