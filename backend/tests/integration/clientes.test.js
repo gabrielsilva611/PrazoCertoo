@@ -17,6 +17,10 @@ beforeAll(async () => {
 });
 
 afterAll(async () => {
+  // Ordem importa: parcela -> venda -> cliente -> usuario, por causa das FKs
+  // com RESTRICT (algumas descrições deste arquivo criam vendas pro cliente).
+  await prisma.parcela.deleteMany({ where: { venda: { negocioId } } });
+  await prisma.venda.deleteMany({ where: { negocioId } });
   await prisma.cliente.deleteMany({ where: { negocioId } });
   await prisma.usuario.deleteMany({ where: { email: emailDono } });
   await prisma.$disconnect();
@@ -134,5 +138,44 @@ describe('isolamento multi-tenant (RN08)', () => {
     expect(resposta.status).toBe(404);
 
     await prisma.usuario.deleteMany({ where: { email: outroEmail } });
+  });
+});
+
+// RN02: "Bom Pagador (sem atrasos nos últimos 6 meses)" — uma parcela vencida
+// há mais de 6 meses sai da janela e não deveria contar pro score, mesmo
+// nunca tendo sido paga. Ponto que ficou sem cobertura no scoreService.test.js
+// (lá o repositório é mockado, então o filtro real de "desde" nunca é exercitado).
+describe('score respeita a janela de 6 meses (RN02)', () => {
+  function diasAtras(n) {
+    return new Date(Date.now() - n * 86_400_000).toISOString().slice(0, 10);
+  }
+
+  test('parcela vencida há mais de 6 meses não conta pro score', async () => {
+    const cliente = await autenticado(request(app).post('/clientes')).send({
+      nome: 'Cliente Dívida Antiga',
+      telefone: '(47) 95555-6666',
+    });
+    const clienteId = cliente.body.cliente.id;
+
+    await autenticado(request(app).post('/vendas')).send({
+      clienteId,
+      valorTotal: 100,
+      numParcelas: 1,
+      dataInicio: diasAtras(210), // ~7 meses atrás, fora da janela de 6 meses
+    });
+
+    const antes = await autenticado(request(app).get(`/clientes/${clienteId}`));
+    expect(antes.body.cliente.score).toBe('BOM_PAGADOR');
+
+    // Uma segunda parcela, essa dentro da janela, agora sim deve contar.
+    await autenticado(request(app).post('/vendas')).send({
+      clienteId,
+      valorTotal: 100,
+      numParcelas: 1,
+      dataInicio: diasAtras(10),
+    });
+
+    const depois = await autenticado(request(app).get(`/clientes/${clienteId}`));
+    expect(depois.body.cliente.score).toBe('IRREGULAR');
   });
 });
