@@ -39,6 +39,22 @@ npm install
 npm run dev                # sobe em http://localhost:5173, com proxy para a API
 ```
 
+## Como rodar os testes
+
+Os testes automatizados usam um **banco separado do de desenvolvimento** (uma branch do Neon), pra não sujar nem depender dos dados que você usa no dia a dia.
+
+```bash
+cd backend
+cp .env.test.example .env.test   # preencha DATABASE_URL com a connection string do banco de TESTE
+npm test                          # roda tudo (unitários + integração) e mostra a cobertura
+```
+
+Se for a primeira vez rodando contra um banco de teste novo, aplique as migrations nele antes:
+
+```bash
+DATABASE_URL="<url do banco de teste>" npx prisma migrate deploy
+```
+
 ## Modelo de dados
 
 O schema (`backend/prisma/schema.prisma`) implementa o modelo de dados do RFC do projeto, dividido em dois módulos:
