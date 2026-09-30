@@ -44,6 +44,14 @@ function buscarParcela(negocioId, vendaId, numero) {
   return prisma.parcela.findFirst({ where: { numero, vendaId, venda: { negocioId } } });
 }
 
+// RF13: a mensagem de cobrança precisa do nome e telefone do cliente.
+function buscarParcelaComCliente(negocioId, vendaId, numero) {
+  return prisma.parcela.findFirst({
+    where: { numero, vendaId, venda: { negocioId } },
+    include: { venda: { include: { cliente: true } } },
+  });
+}
+
 function marcarParcelaPaga(id) {
   return prisma.parcela.update({ where: { id }, data: { pagoEm: new Date() } });
 }
@@ -53,5 +61,6 @@ module.exports = {
   listarPorNegocio,
   criarComParcelas,
   buscarParcela,
+  buscarParcelaComCliente,
   marcarParcelaPaga,
 };
