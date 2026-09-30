@@ -3,6 +3,7 @@ const cors = require('cors');
 const authRoutes = require('./routes/authRoutes');
 const clienteRoutes = require('./routes/clienteRoutes');
 const vendaRoutes = require('./routes/vendaRoutes');
+const dashboardRoutes = require('./routes/dashboardRoutes');
 const { tratarErros } = require('./middlewares/errorHandler');
 
 const app = express();
@@ -15,6 +16,7 @@ app.get('/health', (req, res) => res.json({ status: 'ok' }));
 app.use('/auth', authRoutes);
 app.use('/clientes', clienteRoutes);
 app.use('/vendas', vendaRoutes);
+app.use('/dashboard', dashboardRoutes);
 
 app.use(tratarErros);
 
