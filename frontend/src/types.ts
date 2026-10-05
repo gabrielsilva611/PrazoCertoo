@@ -37,6 +37,15 @@ export interface Parcela {
   status: StatusParcela
 }
 
+export interface Indicadores {
+  totalAReceber: { valor: number; quantidade: number }
+  vencimentosHoje: { valor: number; quantidade: number }
+  emAtraso: { valor: number; clientes: number }
+  vencimentosProximos7Dias: { valor: number; quantidade: number }
+  recebidoNoMes: number
+  clientesInadimplentes: number
+}
+
 export interface Venda {
   id: string
   clienteId: string
