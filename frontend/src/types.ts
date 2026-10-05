@@ -14,7 +14,8 @@ export interface LoginResponse {
 
 export type Score = 'BOM_PAGADOR' | 'IRREGULAR' | 'INADIMPLENTE'
 
-export interface Cliente {
+// Campos que toda rota retorna (vem direto do banco).
+export interface ClienteBasico {
   id: string
   nome: string
   telefone: string
@@ -22,8 +23,14 @@ export interface Cliente {
   cpf: string | null
   observacoes: string | null
   ativo: boolean
-  score: Score
   criadoEm: string
+}
+
+// GET /clientes calcula o score sob demanda — outras rotas que trazem o
+// cliente aninhado (ex: GET /vendas) NÃO têm esse campo, por isso é um tipo
+// separado em vez de só marcar `score` como opcional em todo lugar.
+export interface Cliente extends ClienteBasico {
+  score: Score
 }
 
 export type StatusParcela = 'PENDENTE' | 'PAGO' | 'ATRASADO'
@@ -49,7 +56,7 @@ export interface Indicadores {
 export interface Venda {
   id: string
   clienteId: string
-  cliente?: Cliente
+  cliente?: ClienteBasico
   descricao: string | null
   observacoes: string | null
   valorTotal: string
