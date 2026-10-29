@@ -1,4 +1,4 @@
-const DIA_EM_MS = 1000 * 60 * 60 * 24;
+const { diaLocalDeAgora, diaDoVencimento, DIA_EM_MS } = require('./dataUtil');
 
 // RF09: calcula o valor e a data de cada parcela. Trabalha em centavos pra
 // evitar erro de ponto flutuante; a última parcela absorve o arredondamento
@@ -18,9 +18,12 @@ function calcularParcelas(valorTotal, numParcelas, dataInicio, intervaloDias = 3
 }
 
 // RF12, RN01: status é derivado, não armazenado — evita ficar desatualizado.
+// Compara por dia (fuso de Brasília), não por instante exato: comparar
+// instantes fazia uma parcela que vence hoje virar ATRASADO entre 21h-00h em
+// Brasília (já é "amanhã" em UTC nesse intervalo).
 function statusParcela(parcela, agora = new Date()) {
   if (parcela.pagoEm) return 'PAGO';
-  if (parcela.vencimento < agora) return 'ATRASADO';
+  if (diaDoVencimento(parcela.vencimento) < diaLocalDeAgora(agora)) return 'ATRASADO';
   return 'PENDENTE';
 }
 

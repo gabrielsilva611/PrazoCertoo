@@ -65,4 +65,13 @@ describe('statusParcela', () => {
     const parcela = { pagoEm: null, vencimento: new Date('2026-07-01') };
     expect(statusParcela(parcela, agora)).toBe('PENDENTE');
   });
+
+  test('não vira ATRASADO entre 21h-00h de Brasília (regressão: bug de fuso do self-review do Módulo 5)', () => {
+    // 22h de 15/jun em Brasília já é 01h de 16/jun em UTC — comparando por
+    // instante exato, uma parcela que vence hoje (15/jun) lia como atrasada.
+    const agoraTardeNoBrasil = new Date('2026-06-16T01:00:00Z');
+    const parcelaDeHoje = { pagoEm: null, vencimento: new Date('2026-06-15T00:00:00Z') };
+
+    expect(statusParcela(parcelaDeHoje, agoraTardeNoBrasil)).toBe('PENDENTE');
+  });
 });
