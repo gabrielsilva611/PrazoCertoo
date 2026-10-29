@@ -32,7 +32,10 @@ export function NovaVendaPage() {
   const navegar = useNavigate()
 
   useEffect(() => {
-    api.get<{ clientes: Cliente[] }>('/clientes').then((r) => setClientes(r.clientes))
+    api
+      .get<{ clientes: Cliente[] }>('/clientes')
+      .then((r) => setClientes(r.clientes))
+      .catch((e) => setErro(e instanceof ApiError ? e.message : 'Não foi possível carregar os clientes.'))
   }, [])
 
   const clientesFiltrados = useMemo(() => {
@@ -82,7 +85,9 @@ export function NovaVendaPage() {
 
       <div className="mt-6 grid grid-cols-1 gap-6 lg:grid-cols-[1fr_320px]">
         <form onSubmit={aoSubmeter}>
-          <label className="block text-xs uppercase tracking-wide text-brand-muted">Cliente</label>
+          <label htmlFor="buscaCliente" className="block text-xs uppercase tracking-wide text-brand-muted">
+            Cliente
+          </label>
           {clienteSelecionado ? (
             <div className="mt-1 flex items-center justify-between rounded-md border border-brand-border bg-brand-surface px-3 py-2">
               <div>
@@ -100,6 +105,7 @@ export function NovaVendaPage() {
           ) : (
             <div className="mt-1">
               <input
+                id="buscaCliente"
                 value={buscaCliente}
                 onChange={(e) => setBuscaCliente(e.target.value)}
                 placeholder="Buscar cliente por nome..."
