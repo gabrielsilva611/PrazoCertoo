@@ -6,9 +6,14 @@ const vendaRoutes = require('./routes/vendaRoutes');
 const dashboardRoutes = require('./routes/dashboardRoutes');
 const { tratarErros } = require('./middlewares/errorHandler');
 
-const app = express();
+if (process.env.NODE_ENV === 'production' && !process.env.FRONTEND_URL) {
+  throw new Error('FRONTEND_URL precisa estar configurada em produção (usada pelo CORS).');
+}
 
-app.use(cors());
+const app = express();
+app.disable('x-powered-by');
+
+app.use(cors({ origin: process.env.FRONTEND_URL || 'http://localhost:5173' }));
 app.use(express.json());
 
 app.get('/health', (req, res) => res.json({ status: 'ok' }));
