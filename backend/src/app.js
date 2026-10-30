@@ -6,6 +6,10 @@ const vendaRoutes = require('./routes/vendaRoutes');
 const dashboardRoutes = require('./routes/dashboardRoutes');
 const { tratarErros } = require('./middlewares/errorHandler');
 
+if (process.env.NODE_ENV === 'production' && !process.env.FRONTEND_URL) {
+  throw new Error('FRONTEND_URL precisa estar configurada em produção (usada pelo CORS).');
+}
+
 const app = express();
 app.disable('x-powered-by');
 
