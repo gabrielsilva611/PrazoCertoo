@@ -1,4 +1,5 @@
 const parcelaRepository = require('../repositories/parcelaRepository');
+const { statusParcela } = require('../lib/parcelaUtil');
 
 const SCORE = {
   BOM_PAGADOR: 'BOM_PAGADOR',
@@ -17,7 +18,7 @@ async function calcularScore(clienteId) {
 
   const parcelas = await parcelaRepository.listarPorCliente(clienteId, desde);
 
-  const emAberto = parcelas.filter((p) => p.pagoEm === null && p.vencimento < agora);
+  const emAberto = parcelas.filter((p) => statusParcela(p, agora) === 'ATRASADO');
   const atrasos = emAberto.length;
   const temParcelaAntiga = emAberto.some(
     (p) => agora.getTime() - p.vencimento.getTime() > TRINTA_DIAS_EM_MS,
