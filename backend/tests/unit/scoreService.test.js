@@ -69,4 +69,15 @@ describe('calcularScore (RN02)', () => {
     parcelaRepository.listarPorCliente.mockResolvedValue([parcela({ diasAtras: 30 })]);
     expect(await calcularScore('cliente-1')).toBe('IRREGULAR');
   });
+
+  test('parcela que vence hoje não conta como atraso, mesmo durante o dia (regressão: bug de fuso apontado na revisão do PR #17)', async () => {
+    // 10h em Brasília já é 13h em UTC — comparando vencimento (meia-noite UTC
+    // do dia) contra o instante exato de "agora", a parcela de hoje já lia
+    // como atrasada assim que passava da meia-noite UTC.
+    jest.setSystemTime(new Date('2026-06-15T13:00:00Z'));
+    parcelaRepository.listarPorCliente.mockResolvedValue([
+      { pagoEm: null, vencimento: new Date('2026-06-15T00:00:00Z') },
+    ]);
+    expect(await calcularScore('cliente-1')).toBe('BOM_PAGADOR');
+  });
 });
