@@ -4,6 +4,8 @@ const authRoutes = require('./routes/authRoutes');
 const clienteRoutes = require('./routes/clienteRoutes');
 const vendaRoutes = require('./routes/vendaRoutes');
 const dashboardRoutes = require('./routes/dashboardRoutes');
+const categoriaRoutes = require('./routes/categoriaRoutes');
+const fornecedorRoutes = require('./routes/fornecedorRoutes');
 const { tratarErros } = require('./middlewares/errorHandler');
 
 if (process.env.NODE_ENV === 'production' && !process.env.FRONTEND_URL) {
@@ -22,6 +24,8 @@ app.use('/auth', authRoutes);
 app.use('/clientes', clienteRoutes);
 app.use('/vendas', vendaRoutes);
 app.use('/dashboard', dashboardRoutes);
+app.use('/categorias', categoriaRoutes);
+app.use('/fornecedores', fornecedorRoutes);
 
 app.use(tratarErros);
 
