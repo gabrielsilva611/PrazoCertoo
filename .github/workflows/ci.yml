@@ -31,10 +31,13 @@ jobs:
 
       - run: ./node_modules/.bin/prisma generate
 
+      # Usa a conexão direta (sem pooler) só pra migration: a sessão do
+      # pooler do Neon não fecha de forma confiável quando o processo do
+      # Prisma termina, deixando o advisory lock preso pro próximo run.
       - name: Aplica migrations pendentes no banco de teste
         run: ./node_modules/.bin/prisma migrate deploy
         env:
-          DATABASE_URL: ${{ secrets.DATABASE_URL_TEST }}
+          DATABASE_URL: ${{ secrets.DATABASE_URL_TEST_DIRECT }}
 
       - run: npm test
 
