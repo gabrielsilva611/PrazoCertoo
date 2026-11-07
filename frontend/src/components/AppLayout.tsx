@@ -6,6 +6,7 @@ const ITENS_MENU = [
   { rotulo: 'Dashboard', para: '/' },
   { rotulo: 'Clientes', para: '/clientes' },
   { rotulo: 'Vendas a Prazo', para: '/vendas' },
+  { rotulo: 'Produtos', para: '/produtos' },
 ]
 
 function linkClasse({ isActive }: { isActive: boolean }) {

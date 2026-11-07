@@ -6,6 +6,7 @@ import { DashboardPage } from './pages/DashboardPage'
 import { LoginPage } from './pages/LoginPage'
 import { NovaVendaPage } from './pages/NovaVendaPage'
 import { NovoClientePage } from './pages/NovoClientePage'
+import { ProdutosPage } from './pages/ProdutosPage'
 import { VendasPage } from './pages/VendasPage'
 
 function protegida(elemento: ReactElement) {
@@ -21,6 +22,7 @@ export function App() {
       <Route path="/clientes/novo" element={protegida(<NovoClientePage />)} />
       <Route path="/vendas" element={protegida(<VendasPage />)} />
       <Route path="/vendas/novo" element={protegida(<NovaVendaPage />)} />
+      <Route path="/produtos" element={protegida(<ProdutosPage />)} />
     </Routes>
   )
 }
