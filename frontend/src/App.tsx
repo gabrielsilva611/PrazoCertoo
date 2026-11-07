@@ -1,8 +1,10 @@
 import type { ReactElement } from 'react'
 import { Route, Routes } from 'react-router-dom'
 import { RotaProtegida } from './components/RotaProtegida'
+import { CategoriasPage } from './pages/CategoriasPage'
 import { ClientesPage } from './pages/ClientesPage'
 import { DashboardPage } from './pages/DashboardPage'
+import { FornecedoresPage } from './pages/FornecedoresPage'
 import { LoginPage } from './pages/LoginPage'
 import { NovaVendaPage } from './pages/NovaVendaPage'
 import { NovoClientePage } from './pages/NovoClientePage'
@@ -25,6 +27,8 @@ export function App() {
       <Route path="/vendas/novo" element={protegida(<NovaVendaPage />)} />
       <Route path="/produtos" element={protegida(<ProdutosPage />)} />
       <Route path="/produtos/novo" element={protegida(<NovoProdutoPage />)} />
+      <Route path="/categorias" element={protegida(<CategoriasPage />)} />
+      <Route path="/fornecedores" element={protegida(<FornecedoresPage />)} />
     </Routes>
   )
 }
