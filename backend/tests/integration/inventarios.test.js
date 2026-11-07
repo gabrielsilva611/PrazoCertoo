@@ -1,8 +1,7 @@
-const crypto = require('crypto');
-const jwt = require('jsonwebtoken');
 const request = require('supertest');
 const app = require('../../src/app');
 const prisma = require('../../src/lib/prisma');
+const { criarTokenFuncionario } = require('../helpers/autenticacao');
 
 const emailDono = `teste-inventarios-${Date.now()}@exemplo.com`;
 const senha = 'senhaDeTeste123';
@@ -62,22 +61,7 @@ describe('POST /inventarios', () => {
   });
 
   test('rejeita quando o usuário não é Dono, com 403 (RN13)', async () => {
-    const idFuncionario = crypto.randomUUID();
-    await prisma.usuario.create({
-      data: {
-        id: idFuncionario,
-        negocioId,
-        nome: 'Funcionário de Teste',
-        email: `teste-funcionario-inv-${Date.now()}@exemplo.com`,
-        senhaHash: 'hash-fake-nao-usado-no-login',
-        perfil: 'FUNCIONARIO',
-      },
-    });
-    const tokenFuncionario = jwt.sign(
-      { sub: idFuncionario, negocioId, perfil: 'FUNCIONARIO' },
-      process.env.JWT_SECRET,
-      { expiresIn: '1h' },
-    );
+    const tokenFuncionario = await criarTokenFuncionario(negocioId);
 
     const resposta = await request(app)
       .post('/inventarios')
