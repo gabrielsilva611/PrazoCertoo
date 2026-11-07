@@ -110,7 +110,9 @@ export function ProdutosPage() {
               return (
                 <tr key={produto.id} className="border-t border-brand-border">
                   <td className="px-4 py-3">
-                    {produto.nome}
+                    <Link to={`/produtos/${produto.id}`} className="hover:text-brand-accent hover:underline">
+                      {produto.nome}
+                    </Link>
                     <span className="ml-2 text-xs text-brand-muted">{produto.unidade}</span>
                   </td>
                   <td className="px-4 py-3 text-brand-muted">{nomeCategoria(produto.categoriaId)}</td>

@@ -72,6 +72,20 @@ export interface Produto {
   capitalImobilizado: number
 }
 
+export type TipoMovimentacao = 'ENTRADA' | 'SAIDA' | 'AJUSTE' | 'INVENTARIO'
+
+export interface MovimentacaoEstoque {
+  id: string
+  produtoId: string
+  fornecedorId: string | null
+  tipo: TipoMovimentacao
+  quantidade: number
+  saldoAnterior: number
+  saldoPosterior: number
+  motivo: string | null
+  criadoEm: string
+}
+
 export interface Venda {
   id: string
   clienteId: string
