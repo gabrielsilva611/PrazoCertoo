@@ -1,10 +1,23 @@
 const prisma = require('../lib/prisma');
+const { Prisma } = require('../../generated/prisma');
 const AppError = require('../lib/AppError');
 
 // Todo acesso é escopado por negocioId — isolamento multi-tenant (RN08, RN15).
 
-function criar(negocioId, usuarioId) {
-  return prisma.inventario.create({ data: { negocioId, usuarioId } });
+// O service já confere se há um inventário ABERTO antes de chamar isto, mas
+// essa checagem é check-then-act (corrida possível). O índice único parcial
+// "inventarios_aberto_unico_por_negocio" (migration, não representável no
+// Prisma Schema Language) é quem garante a regra de fato — aqui só traduz a
+// violação dele pra um 409 em vez de deixar o erro bruto do Postgres subir.
+async function criar(negocioId, usuarioId) {
+  try {
+    return await prisma.inventario.create({ data: { negocioId, usuarioId } });
+  } catch (erro) {
+    if (erro instanceof Prisma.PrismaClientKnownRequestError && erro.code === 'P2002') {
+      throw new AppError('Já existe um inventário aberto. Conclua-o antes de iniciar outro.', 409);
+    }
+    throw erro;
+  }
 }
 
 function buscarAberto(negocioId) {
