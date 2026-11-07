@@ -53,6 +53,25 @@ export interface Indicadores {
   clientesInadimplentes: number
 }
 
+export interface Categoria {
+  id: string
+  nome: string
+  descricao: string | null
+}
+
+export interface Produto {
+  id: string
+  categoriaId: string | null
+  nome: string
+  unidade: string
+  precoCusto: string
+  precoVenda: string
+  saldoAtual: number
+  estoqueMinimo: number
+  ativo: boolean
+  capitalImobilizado: number
+}
+
 export interface Venda {
   id: string
   clienteId: string
