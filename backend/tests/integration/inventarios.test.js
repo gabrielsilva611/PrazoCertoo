@@ -10,6 +10,7 @@ const senha = 'senhaDeTeste123';
 let token;
 let negocioId;
 let produtoId;
+let inventarioId;
 
 beforeAll(async () => {
   const registro = await request(app)
@@ -52,6 +53,12 @@ describe('POST /inventarios', () => {
 
     expect(resposta.status).toBe(201);
     expect(resposta.body.inventario).toMatchObject({ status: 'ABERTO', negocioId });
+    inventarioId = resposta.body.inventario.id;
+  });
+
+  test('rejeita abrir um segundo inventário enquanto o primeiro está aberto, com 409', async () => {
+    const resposta = await autenticado(request(app).post('/inventarios'));
+    expect(resposta.status).toBe(409);
   });
 
   test('rejeita quando o usuário não é Dono, com 403 (RN13)', async () => {
@@ -81,13 +88,6 @@ describe('POST /inventarios', () => {
 });
 
 describe('fluxo de contagem e conclusão', () => {
-  let inventarioId;
-
-  beforeAll(async () => {
-    const resposta = await autenticado(request(app).post('/inventarios'));
-    inventarioId = resposta.body.inventario.id;
-  });
-
   test('rejeita item sem justificativa quando há divergência, com 409', async () => {
     const resposta = await autenticado(request(app).put(`/inventarios/${inventarioId}/itens`)).send({
       produtoId,
@@ -155,18 +155,21 @@ describe('fluxo de contagem e conclusão', () => {
 });
 
 describe('validações e isolamento', () => {
-  test('rejeita concluir inventário sem nenhum item, com 409', async () => {
+  let outroInventarioId;
+
+  beforeAll(async () => {
     const aberto = await autenticado(request(app).post('/inventarios'));
-    const resposta = await autenticado(
-      request(app).patch(`/inventarios/${aberto.body.inventario.id}/concluir`),
-    );
+    outroInventarioId = aberto.body.inventario.id;
+  });
+
+  test('rejeita concluir inventário sem nenhum item, com 409', async () => {
+    const resposta = await autenticado(request(app).patch(`/inventarios/${outroInventarioId}/concluir`));
     expect(resposta.status).toBe(409);
   });
 
   test('rejeita produtoId inexistente no item, com 404', async () => {
-    const aberto = await autenticado(request(app).post('/inventarios'));
     const resposta = await autenticado(
-      request(app).put(`/inventarios/${aberto.body.inventario.id}/itens`),
+      request(app).put(`/inventarios/${outroInventarioId}/itens`),
     ).send({ produtoId: '00000000-0000-0000-0000-000000000000', saldoFisico: 1 });
 
     expect(resposta.status).toBe(404);

@@ -1,9 +1,14 @@
 const prisma = require('../lib/prisma');
+const AppError = require('../lib/AppError');
 
 // Todo acesso é escopado por negocioId — isolamento multi-tenant (RN08, RN15).
 
 function criar(negocioId, usuarioId) {
   return prisma.inventario.create({ data: { negocioId, usuarioId } });
+}
+
+function buscarAberto(negocioId) {
+  return prisma.inventario.findFirst({ where: { negocioId, status: 'ABERTO' } });
 }
 
 function listarPorNegocio(negocioId) {
@@ -30,9 +35,20 @@ function salvarItem({ inventarioId, produtoId, saldoSistema, saldoFisico, difere
 }
 
 // RF28, RN12: aplica cada divergência como uma movimentação de estoque
-// (tipo INVENTARIO) e fecha o inventário — tudo em uma transação só.
+// (tipo INVENTARIO) e fecha o inventário — tudo em uma transação só. O
+// updateMany com "status: ABERTO" no where (em vez de um update por id)
+// garante que duas conclusões simultâneas não processem a mesma contagem
+// duas vezes: só a primeira encontra o inventário ainda aberto.
 function concluir(id, movimentacoes) {
   return prisma.$transaction(async (tx) => {
+    const { count } = await tx.inventario.updateMany({
+      where: { id, status: 'ABERTO' },
+      data: { status: 'CONCLUIDO', concluidoEm: new Date() },
+    });
+    if (count === 0) {
+      throw new AppError('Este inventário já foi concluído.', 409);
+    }
+
     for (const movimentacao of movimentacoes) {
       await tx.produto.update({
         where: { id: movimentacao.produtoId },
@@ -41,12 +57,11 @@ function concluir(id, movimentacoes) {
       await tx.movimentacaoEstoque.create({ data: movimentacao });
     }
 
-    return tx.inventario.update({
+    return tx.inventario.findUniqueOrThrow({
       where: { id },
-      data: { status: 'CONCLUIDO', concluidoEm: new Date() },
       include: { itens: { include: { produto: true }, orderBy: { id: 'asc' } } },
     });
   });
 }
 
-module.exports = { criar, listarPorNegocio, buscarPorId, salvarItem, concluir };
+module.exports = { criar, buscarAberto, listarPorNegocio, buscarPorId, salvarItem, concluir };

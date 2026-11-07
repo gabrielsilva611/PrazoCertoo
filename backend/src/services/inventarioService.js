@@ -3,7 +3,16 @@ const produtoRepository = require('../repositories/produtoRepository');
 const AppError = require('../lib/AppError');
 
 // RF28, RN13: abre um novo inventário (rascunho de contagem física).
-function abrir(negocioId, usuarioId) {
+// Só um inventário pode estar ABERTO por vez, pra não dividir a contagem
+// física em dois rascunhos inconsistentes.
+async function abrir(negocioId, usuarioId) {
+  const aberto = await inventarioRepository.buscarAberto(negocioId);
+  if (aberto) {
+    throw new AppError(
+      'Já existe um inventário aberto. Conclua-o antes de iniciar outro.',
+      409,
+    );
+  }
   return inventarioRepository.criar(negocioId, usuarioId);
 }
 
