@@ -29,6 +29,7 @@ export function ProdutoDetalhePage() {
       .then(([resProduto, resMovimentacoes]) => {
         setProduto(resProduto.produto)
         setMovimentacoes(resMovimentacoes.movimentacoes)
+        setErro(null)
       })
       .catch((e) => setErro(e instanceof ApiError ? e.message : 'Não foi possível carregar o produto.'))
       .finally(() => setCarregando(false))
