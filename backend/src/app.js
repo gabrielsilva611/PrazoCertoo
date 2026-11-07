@@ -7,6 +7,7 @@ const dashboardRoutes = require('./routes/dashboardRoutes');
 const categoriaRoutes = require('./routes/categoriaRoutes');
 const fornecedorRoutes = require('./routes/fornecedorRoutes');
 const produtoRoutes = require('./routes/produtoRoutes');
+const inventarioRoutes = require('./routes/inventarioRoutes');
 const { tratarErros } = require('./middlewares/errorHandler');
 
 if (process.env.NODE_ENV === 'production' && !process.env.FRONTEND_URL) {
@@ -28,6 +29,7 @@ app.use('/dashboard', dashboardRoutes);
 app.use('/categorias', categoriaRoutes);
 app.use('/fornecedores', fornecedorRoutes);
 app.use('/produtos', produtoRoutes);
+app.use('/inventarios', inventarioRoutes);
 
 app.use(tratarErros);
 
