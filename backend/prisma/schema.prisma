@@ -211,7 +211,11 @@ model MovimentacaoEstoque {
   @@map("movimentacoes_estoque")
 }
 
-// RF28, RN13: inventário físico — só o perfil Dono realiza
+// RF28, RN13: inventário físico — só o perfil Dono realiza.
+// Migration "inventario_aberto_unico_por_negocio" adiciona um índice único
+// parcial (negocio_id WHERE status='ABERTO') que o Prisma Schema Language
+// não representa — a linguagem não suporta índice parcial. Não rodar
+// "prisma db pull" sem checar se ele preserva esse índice.
 model Inventario {
   id          String           @id @default(uuid()) @db.Uuid
   negocioId   String           @map("negocio_id") @db.Uuid
@@ -240,6 +244,8 @@ model InventarioItem {
   inventario Inventario @relation(fields: [inventarioId], references: [id])
   produto    Produto    @relation(fields: [produtoId], references: [id])
 
+  // Uma contagem por produto em cada inventário — reconferir atualiza o item, não duplica.
+  @@unique([inventarioId, produtoId])
   @@index([inventarioId])
   @@map("inventario_itens")
 }
