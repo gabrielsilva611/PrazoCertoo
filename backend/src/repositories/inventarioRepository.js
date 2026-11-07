@@ -17,23 +17,16 @@ function buscarPorId(negocioId, id) {
   });
 }
 
-function buscarItem(inventarioId, produtoId) {
-  return prisma.inventarioItem.findFirst({ where: { inventarioId, produtoId } });
-}
-
-function salvarItem({ id, inventarioId, produtoId, saldoSistema, saldoFisico, diferenca, justificativa }) {
-  const dados = {
-    inventarioId,
-    produtoId,
-    saldoSistema,
-    saldoFisico,
-    diferenca,
-    justificativa: justificativa ?? null,
-  };
-  if (id) {
-    return prisma.inventarioItem.update({ where: { id }, data: dados });
-  }
-  return prisma.inventarioItem.create({ data: dados });
+// Reconferir o mesmo produto atualiza o item em vez de duplicar — upsert
+// pela constraint única (inventarioId, produtoId) evita a corrida de duas
+// requisições simultâneas criando dois itens pro mesmo produto.
+function salvarItem({ inventarioId, produtoId, saldoSistema, saldoFisico, diferenca, justificativa }) {
+  const dados = { saldoSistema, saldoFisico, diferenca, justificativa: justificativa ?? null };
+  return prisma.inventarioItem.upsert({
+    where: { inventarioId_produtoId: { inventarioId, produtoId } },
+    create: { inventarioId, produtoId, ...dados },
+    update: dados,
+  });
 }
 
 // RF28, RN12: aplica cada divergência como uma movimentação de estoque
@@ -56,4 +49,4 @@ function concluir(id, movimentacoes) {
   });
 }
 
-module.exports = { criar, listarPorNegocio, buscarPorId, buscarItem, salvarItem, concluir };
+module.exports = { criar, listarPorNegocio, buscarPorId, salvarItem, concluir };

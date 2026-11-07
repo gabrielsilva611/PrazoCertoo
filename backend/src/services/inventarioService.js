@@ -36,10 +36,7 @@ async function registrarItem(negocioId, inventarioId, dados) {
     );
   }
 
-  const itemExistente = await inventarioRepository.buscarItem(inventarioId, dados.produtoId);
-
   return inventarioRepository.salvarItem({
-    id: itemExistente?.id,
     inventarioId,
     produtoId: dados.produtoId,
     saldoSistema,
@@ -49,8 +46,10 @@ async function registrarItem(negocioId, inventarioId, dados) {
   });
 }
 
-// RF28, RN12: fecha o inventário — cada divergência gera uma movimentação de
-// estoque (tipo INVENTARIO) e o saldo do produto passa a ser o saldo físico contado.
+// RF28, RN12: fecha o inventário — cada divergência encontrada na contagem
+// gera uma movimentação de estoque (tipo INVENTARIO), aplicada como delta
+// sobre o saldo atual do produto (não como substituição) pra não apagar
+// vendas/entradas registradas depois da contagem e antes da conclusão.
 async function concluir(negocioId, inventarioId, usuarioId) {
   const inventario = await buscarOuFalhar(negocioId, inventarioId);
   if (inventario.status !== 'ABERTO') {
@@ -60,18 +59,22 @@ async function concluir(negocioId, inventarioId, usuarioId) {
     throw new AppError('Registre ao menos um item antes de concluir o inventário.', 409);
   }
 
+  const produtoIds = inventario.itens.map((item) => item.produtoId);
+  const produtos = await produtoRepository.listarPorIdsIncluindoInativos(negocioId, produtoIds);
+  const produtoPorId = new Map(produtos.map((produto) => [produto.id, produto]));
+
   const movimentacoes = [];
   for (const item of inventario.itens) {
-    const produto = await produtoRepository.buscarPorIdIncluindoInativos(negocioId, item.produtoId);
-    if (!produto || produto.saldoAtual === item.saldoFisico) continue;
+    const produto = produtoPorId.get(item.produtoId);
+    if (!produto || item.diferenca === 0) continue;
 
     movimentacoes.push({
       produtoId: item.produtoId,
       usuarioId,
       tipo: 'INVENTARIO',
-      quantidade: Math.abs(item.saldoFisico - produto.saldoAtual),
+      quantidade: Math.abs(item.diferenca),
       saldoAnterior: produto.saldoAtual,
-      saldoPosterior: item.saldoFisico,
+      saldoPosterior: produto.saldoAtual + item.diferenca,
       motivo: item.justificativa ?? `Ajuste por contagem de inventário (${inventarioId})`,
     });
   }

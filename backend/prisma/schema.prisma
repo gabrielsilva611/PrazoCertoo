@@ -240,6 +240,8 @@ model InventarioItem {
   inventario Inventario @relation(fields: [inventarioId], references: [id])
   produto    Produto    @relation(fields: [produtoId], references: [id])
 
+  // Uma contagem por produto em cada inventário — reconferir atualiza o item, não duplica.
+  @@unique([inventarioId, produtoId])
   @@index([inventarioId])
   @@map("inventario_itens")
 }

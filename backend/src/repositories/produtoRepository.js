@@ -22,6 +22,11 @@ function buscarPorIdIncluindoInativos(negocioId, id) {
   return prisma.produto.findFirst({ where: { id, negocioId } });
 }
 
+// Usado pela conclusão do inventário (RF28) pra evitar 1 query por item.
+function listarPorIdsIncluindoInativos(negocioId, ids) {
+  return prisma.produto.findMany({ where: { id: { in: ids }, negocioId } });
+}
+
 function criar(negocioId, dados) {
   return prisma.produto.create({ data: { ...dados, negocioId } });
 }
@@ -43,6 +48,7 @@ module.exports = {
   listarPorNegocio,
   buscarPorId,
   buscarPorIdIncluindoInativos,
+  listarPorIdsIncluindoInativos,
   criar,
   atualizar,
   desativar,
