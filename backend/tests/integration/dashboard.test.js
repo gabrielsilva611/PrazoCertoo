@@ -1,8 +1,9 @@
+const crypto = require('crypto');
+const jwt = require('jsonwebtoken');
 const request = require('supertest');
 const app = require('../../src/app');
 const prisma = require('../../src/lib/prisma');
 const { diaLocalDeAgora } = require('../../src/lib/dashboardUtil');
-const { criarTokenFuncionario } = require('../helpers/autenticacao');
 
 const emailDono = `teste-dashboard-${Date.now()}@exemplo.com`;
 const senha = 'senhaDeTeste123';
@@ -103,7 +104,22 @@ describe('GET /dashboard (RF16)', () => {
   });
 
   test('retorna 403 para perfil Funcionário (RN03)', async () => {
-    const tokenFuncionario = await criarTokenFuncionario(negocioId);
+    const idFuncionario = crypto.randomUUID();
+    await prisma.usuario.create({
+      data: {
+        id: idFuncionario,
+        negocioId,
+        nome: 'Funcionário de Teste',
+        email: `teste-funcionario-${Date.now()}@exemplo.com`,
+        senhaHash: 'hash-fake-nao-usado-no-login',
+        perfil: 'FUNCIONARIO',
+      },
+    });
+    const tokenFuncionario = jwt.sign(
+      { sub: idFuncionario, negocioId, perfil: 'FUNCIONARIO' },
+      process.env.JWT_SECRET,
+      { expiresIn: '1h' },
+    );
 
     const resposta = await request(app)
       .get('/dashboard')
