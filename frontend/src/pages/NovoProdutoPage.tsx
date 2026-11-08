@@ -32,9 +32,9 @@ export function NovoProdutoPage() {
       })
   }, [])
 
-  function aoSubmeter(evento: FormEvent) {
+  async function aoSubmeter(evento: FormEvent) {
     evento.preventDefault()
-    submeter({
+    await submeter({
       nome,
       unidade,
       categoriaId: categoriaId || undefined,
