@@ -59,6 +59,12 @@ export interface Categoria {
   descricao: string | null
 }
 
+export interface Fornecedor {
+  id: string
+  nome: string
+  contato: string | null
+}
+
 export interface Produto {
   id: string
   categoriaId: string | null
@@ -70,6 +76,20 @@ export interface Produto {
   estoqueMinimo: number
   ativo: boolean
   capitalImobilizado: number
+}
+
+export type TipoMovimentacao = 'ENTRADA' | 'SAIDA' | 'AJUSTE' | 'INVENTARIO'
+
+export interface MovimentacaoEstoque {
+  id: string
+  produtoId: string
+  fornecedorId: string | null
+  tipo: TipoMovimentacao
+  quantidade: number
+  saldoAnterior: number
+  saldoPosterior: number
+  motivo: string | null
+  criadoEm: string
 }
 
 export interface Venda {
