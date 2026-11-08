@@ -136,3 +136,26 @@ export interface DadosCliente {
   cpf?: string
   observacoes?: string
 }
+
+export type StatusInventario = 'ABERTO' | 'CONCLUIDO'
+
+export interface InventarioResumo {
+  id: string
+  status: StatusInventario
+  iniciadoEm: string
+  concluidoEm: string | null
+}
+
+export interface InventarioItem {
+  id: string
+  produtoId: string
+  produto: Produto
+  saldoSistema: number
+  saldoFisico: number
+  diferenca: number
+  justificativa: string | null
+}
+
+export interface InventarioDetalhe extends InventarioResumo {
+  itens: InventarioItem[]
+}
