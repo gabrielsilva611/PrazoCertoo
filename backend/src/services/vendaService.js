@@ -43,31 +43,22 @@ async function registrar(negocioId, dados) {
 }
 
 // RN10: se o saldo for insuficiente, não bloqueia — mas exige uma justificativa
-// explícita do usuário antes de deixar o saldo ficar negativo.
+// explícita do usuário antes de deixar o saldo ficar negativo. A checagem em
+// si (e o saldoAnterior/saldoPosterior) só é feita depois, dentro da
+// transação de vendaRepository.criarComParcelas — aqui só confere que o
+// produto existe.
 async function montarMovimentacaoEstoque(negocioId, dados) {
   const produto = await produtoRepository.buscarPorId(negocioId, dados.produtoId);
   if (!produto) {
     throw new AppError('Produto não encontrado.', 404);
   }
 
-  const saldoInsuficiente = produto.saldoAtual < QUANTIDADE_POR_VENDA;
-  if (saldoInsuficiente && !dados.justificativaEstoque) {
-    throw new AppError(
-      'Estoque insuficiente para este produto. Envie "justificativaEstoque" para confirmar a venda mesmo assim.',
-      409,
-    );
-  }
-
   return {
     produtoId: produto.id,
     usuarioId: dados.usuarioId,
     tipo: 'SAIDA',
-    quantidade: QUANTIDADE_POR_VENDA,
-    saldoAnterior: produto.saldoAtual,
-    saldoPosterior: produto.saldoAtual - QUANTIDADE_POR_VENDA,
-    motivo: saldoInsuficiente
-      ? `Venda com estoque insuficiente: ${dados.justificativaEstoque}`
-      : 'Venda a prazo',
+    delta: -QUANTIDADE_POR_VENDA,
+    justificativaEstoque: dados.justificativaEstoque,
   };
 }
 

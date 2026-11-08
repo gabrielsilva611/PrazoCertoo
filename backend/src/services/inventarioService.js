@@ -58,7 +58,10 @@ async function registrarItem(negocioId, inventarioId, dados) {
 // RF28, RN12: fecha o inventário — cada divergência encontrada na contagem
 // gera uma movimentação de estoque (tipo INVENTARIO), aplicada como delta
 // sobre o saldo atual do produto (não como substituição) pra não apagar
-// vendas/entradas registradas depois da contagem e antes da conclusão.
+// vendas/entradas registradas depois da contagem e antes da conclusão. O
+// delta é aplicado com "increment" dentro da transação do repositório — não
+// lemos mais produto.saldoAtual aqui pra montar um saldoPosterior absoluto,
+// porque essa leitura fora da transação é o que causava a corrida.
 async function concluir(negocioId, inventarioId, usuarioId) {
   const inventario = await buscarOuFalhar(negocioId, inventarioId);
   if (inventario.status !== 'ABERTO') {
@@ -70,25 +73,18 @@ async function concluir(negocioId, inventarioId, usuarioId) {
 
   const produtoIds = inventario.itens.map((item) => item.produtoId);
   const produtos = await produtoRepository.listarPorIdsIncluindoInativos(negocioId, produtoIds);
-  const produtoPorId = new Map(produtos.map((produto) => [produto.id, produto]));
+  const idsExistentes = new Set(produtos.map((produto) => produto.id));
 
-  const movimentacoes = [];
-  for (const item of inventario.itens) {
-    const produto = produtoPorId.get(item.produtoId);
-    if (!produto || item.diferenca === 0) continue;
-
-    movimentacoes.push({
+  const ajustes = inventario.itens
+    .filter((item) => idsExistentes.has(item.produtoId) && item.diferenca !== 0)
+    .map((item) => ({
       produtoId: item.produtoId,
       usuarioId,
-      tipo: 'INVENTARIO',
-      quantidade: Math.abs(item.diferenca),
-      saldoAnterior: produto.saldoAtual,
-      saldoPosterior: produto.saldoAtual + item.diferenca,
+      delta: item.diferenca,
       motivo: item.justificativa ?? `Ajuste por contagem de inventário (${inventarioId})`,
-    });
-  }
+    }));
 
-  return inventarioRepository.concluir(inventarioId, movimentacoes);
+  return inventarioRepository.concluir(inventarioId, ajustes);
 }
 
 async function buscarOuFalhar(negocioId, id) {

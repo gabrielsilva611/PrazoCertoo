@@ -51,8 +51,11 @@ function salvarItem({ inventarioId, produtoId, saldoSistema, saldoFisico, difere
 // (tipo INVENTARIO) e fecha o inventário — tudo em uma transação só. O
 // updateMany com "status: ABERTO" no where (em vez de um update por id)
 // garante que duas conclusões simultâneas não processem a mesma contagem
-// duas vezes: só a primeira encontra o inventário ainda aberto.
-function concluir(id, movimentacoes) {
+// duas vezes: só a primeira encontra o inventário ainda aberto. O saldo do
+// produto é alterado com "increment" (o delta já calculado no service), não
+// com um SET do valor absoluto — isso serializa a conclusão com qualquer
+// outra movimentação concorrente no mesmo produto em vez de sobrescrevê-la.
+function concluir(id, ajustes) {
   return prisma.$transaction(async (tx) => {
     const { count } = await tx.inventario.updateMany({
       where: { id, status: 'ABERTO' },
@@ -62,12 +65,23 @@ function concluir(id, movimentacoes) {
       throw new AppError('Este inventário já foi concluído.', 409);
     }
 
-    for (const movimentacao of movimentacoes) {
-      await tx.produto.update({
-        where: { id: movimentacao.produtoId },
-        data: { saldoAtual: movimentacao.saldoPosterior },
+    for (const ajuste of ajustes) {
+      const produto = await tx.produto.update({
+        where: { id: ajuste.produtoId },
+        data: { saldoAtual: { increment: ajuste.delta } },
       });
-      await tx.movimentacaoEstoque.create({ data: movimentacao });
+
+      await tx.movimentacaoEstoque.create({
+        data: {
+          produtoId: ajuste.produtoId,
+          usuarioId: ajuste.usuarioId,
+          tipo: 'INVENTARIO',
+          quantidade: Math.abs(ajuste.delta),
+          saldoAnterior: produto.saldoAtual - ajuste.delta,
+          saldoPosterior: produto.saldoAtual,
+          motivo: ajuste.motivo,
+        },
+      });
     }
 
     return tx.inventario.findUniqueOrThrow({
