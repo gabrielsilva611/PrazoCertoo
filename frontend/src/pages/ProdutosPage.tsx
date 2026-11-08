@@ -78,12 +78,13 @@ export function ProdutosPage() {
               <th className="px-4 py-3 font-medium">Saldo</th>
               <th className="px-4 py-3 font-medium">Preço de venda</th>
               <th className="px-4 py-3 font-medium">Capital imobilizado</th>
+              <th className="px-4 py-3 font-medium"></th>
             </tr>
           </thead>
           <tbody>
             {carregando && (
               <tr>
-                <td colSpan={5} className="px-4 py-6 text-center text-brand-muted">
+                <td colSpan={6} className="px-4 py-6 text-center text-brand-muted">
                   Carregando...
                 </td>
               </tr>
@@ -91,7 +92,7 @@ export function ProdutosPage() {
 
             {!carregando && erro && (
               <tr>
-                <td colSpan={5} className="px-4 py-6 text-center text-red-400">
+                <td colSpan={6} className="px-4 py-6 text-center text-red-400">
                   {erro}
                 </td>
               </tr>
@@ -99,7 +100,7 @@ export function ProdutosPage() {
 
             {!carregando && !erro && filtrados.length === 0 && (
               <tr>
-                <td colSpan={5} className="px-4 py-6 text-center text-brand-muted">
+                <td colSpan={6} className="px-4 py-6 text-center text-brand-muted">
                   Nenhum produto encontrado.
                 </td>
               </tr>
@@ -127,6 +128,14 @@ export function ProdutosPage() {
                   <td className="px-4 py-3">{formatoMoeda.format(Number(produto.precoVenda))}</td>
                   <td className="px-4 py-3 text-brand-muted">
                     {formatoMoeda.format(produto.capitalImobilizado)}
+                  </td>
+                  <td className="px-4 py-3 text-right">
+                    <Link
+                      to={`/produtos/${produto.id}/editar`}
+                      className="text-brand-accent hover:underline"
+                    >
+                      Editar
+                    </Link>
                   </td>
                 </tr>
               )

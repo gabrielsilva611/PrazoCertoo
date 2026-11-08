@@ -3,6 +3,7 @@ import { Route, Routes } from 'react-router-dom'
 import { RotaProtegida } from './components/RotaProtegida'
 import { ClientesPage } from './pages/ClientesPage'
 import { DashboardPage } from './pages/DashboardPage'
+import { EditarProdutoPage } from './pages/EditarProdutoPage'
 import { LoginPage } from './pages/LoginPage'
 import { NovaVendaPage } from './pages/NovaVendaPage'
 import { NovoClientePage } from './pages/NovoClientePage'
@@ -25,6 +26,7 @@ export function App() {
       <Route path="/vendas/novo" element={protegida(<NovaVendaPage />)} />
       <Route path="/produtos" element={protegida(<ProdutosPage />)} />
       <Route path="/produtos/novo" element={protegida(<NovoProdutoPage />)} />
+      <Route path="/produtos/:id/editar" element={protegida(<EditarProdutoPage />)} />
     </Routes>
   )
 }
