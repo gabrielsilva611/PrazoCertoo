@@ -1,7 +1,7 @@
 import { useEffect, useState, type FormEvent } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { AppLayout } from '../components/AppLayout'
-import { FormField, estiloInput } from '../components/FormField'
+import { ProdutoFormCampos } from '../components/ProdutoFormCampos'
 import { api, ApiError } from '../lib/api'
 import type { Categoria, Produto } from '../types'
 
@@ -53,79 +53,21 @@ export function NovoProdutoPage() {
       <p className="text-sm text-brand-muted">Preencha as informações para cadastrar o produto</p>
 
       <form onSubmit={aoSubmeter} className="mt-6 flex max-w-lg flex-col gap-4">
-        <FormField rotulo="Nome do produto" id="nome" obrigatorio>
-          <input
-            id="nome"
-            required
-            value={nome}
-            onChange={(e) => setNome(e.target.value)}
-            className={estiloInput}
-          />
-        </FormField>
-
-        <div className="grid grid-cols-2 gap-4">
-          <FormField rotulo="Unidade" id="unidade" obrigatorio>
-            <input
-              id="unidade"
-              required
-              value={unidade}
-              onChange={(e) => setUnidade(e.target.value)}
-              placeholder="un, kg, cx..."
-              className={estiloInput}
-            />
-          </FormField>
-
-          <FormField rotulo="Categoria" id="categoriaId">
-            <select
-              id="categoriaId"
-              value={categoriaId}
-              onChange={(e) => setCategoriaId(e.target.value)}
-              className={estiloInput}
-            >
-              <option value="">Sem categoria</option>
-              {categorias.map((categoria) => (
-                <option key={categoria.id} value={categoria.id}>
-                  {categoria.nome}
-                </option>
-              ))}
-            </select>
-          </FormField>
-        </div>
-
-        <div className="grid grid-cols-2 gap-4">
-          <FormField rotulo="Preço de custo (R$)" id="precoCusto" obrigatorio>
-            <input
-              id="precoCusto"
-              required
-              inputMode="decimal"
-              value={precoCusto}
-              onChange={(e) => setPrecoCusto(e.target.value)}
-              className={estiloInput}
-            />
-          </FormField>
-          <FormField rotulo="Preço de venda (R$)" id="precoVenda" obrigatorio>
-            <input
-              id="precoVenda"
-              required
-              inputMode="decimal"
-              value={precoVenda}
-              onChange={(e) => setPrecoVenda(e.target.value)}
-              className={estiloInput}
-            />
-          </FormField>
-        </div>
-
-        <FormField rotulo="Estoque mínimo" id="estoqueMinimo" obrigatorio>
-          <input
-            id="estoqueMinimo"
-            required
-            type="number"
-            min={0}
-            value={estoqueMinimo}
-            onChange={(e) => setEstoqueMinimo(e.target.value)}
-            className={estiloInput}
-          />
-        </FormField>
+        <ProdutoFormCampos
+          nome={nome}
+          onNomeChange={setNome}
+          unidade={unidade}
+          onUnidadeChange={setUnidade}
+          categoriaId={categoriaId}
+          onCategoriaIdChange={setCategoriaId}
+          categorias={categorias}
+          precoCusto={precoCusto}
+          onPrecoCustoChange={setPrecoCusto}
+          precoVenda={precoVenda}
+          onPrecoVendaChange={setPrecoVenda}
+          estoqueMinimo={estoqueMinimo}
+          onEstoqueMinimoChange={setEstoqueMinimo}
+        />
 
         {erro && <p className="text-sm text-red-400">{erro}</p>}
 
