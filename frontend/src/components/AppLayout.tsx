@@ -7,6 +7,8 @@ const ITENS_MENU = [
   { rotulo: 'Clientes', para: '/clientes' },
   { rotulo: 'Vendas a Prazo', para: '/vendas' },
   { rotulo: 'Produtos', para: '/produtos' },
+  { rotulo: 'Categorias', para: '/categorias' },
+  { rotulo: 'Fornecedores', para: '/fornecedores' },
 ]
 
 function linkClasse({ isActive }: { isActive: boolean }) {
