@@ -9,6 +9,8 @@ const ITENS_MENU = [
   { rotulo: 'Produtos', para: '/produtos' },
   { rotulo: 'Categorias', para: '/categorias' },
   { rotulo: 'Fornecedores', para: '/fornecedores' },
+  // RF28, RN13: inventário físico é exclusivo do Dono, assim como no backend.
+  { rotulo: 'Inventário', para: '/inventario', somenteDono: true },
   // Configurações do negócio (ex: cor de destaque) são exclusivas do Dono, como no backend.
   { rotulo: 'Configurações', para: '/configuracoes', somenteDono: true },
 ]

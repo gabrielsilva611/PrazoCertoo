@@ -9,6 +9,8 @@ import { DashboardPage } from './pages/DashboardPage'
 import { EditarClientePage } from './pages/EditarClientePage'
 import { EditarProdutoPage } from './pages/EditarProdutoPage'
 import { FornecedoresPage } from './pages/FornecedoresPage'
+import { InventarioDetalhePage } from './pages/InventarioDetalhePage'
+import { InventariosPage } from './pages/InventariosPage'
 import { LoginPage } from './pages/LoginPage'
 import { NovaVendaPage } from './pages/NovaVendaPage'
 import { NovoClientePage } from './pages/NovoClientePage'
@@ -38,6 +40,8 @@ export function App() {
       <Route path="/produtos/:id/editar" element={protegida(<EditarProdutoPage />)} />
       <Route path="/categorias" element={protegida(<CategoriasPage />)} />
       <Route path="/fornecedores" element={protegida(<FornecedoresPage />)} />
+      <Route path="/inventario" element={protegida(<InventariosPage />)} />
+      <Route path="/inventario/:id" element={protegida(<InventarioDetalhePage />)} />
       <Route path="/configuracoes" element={protegida(<ConfiguracoesPage />)} />
     </Routes>
   )
