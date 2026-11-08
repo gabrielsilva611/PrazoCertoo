@@ -1,7 +1,9 @@
 import { useEffect, useState, type FormEvent } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
+import { AcoesFormulario } from '../components/AcoesFormulario'
 import { AppLayout } from '../components/AppLayout'
 import { ProdutoFormCampos } from '../components/ProdutoFormCampos'
+import { useSalvarProduto } from '../hooks/useSalvarProduto'
 import { api, ApiError } from '../lib/api'
 import type { Categoria, Produto } from '../types'
 
@@ -15,9 +17,14 @@ export function EditarProdutoPage() {
   const [estoqueMinimo, setEstoqueMinimo] = useState('0')
   const [categoriaId, setCategoriaId] = useState('')
   const [carregando, setCarregando] = useState(true)
-  const [erro, setErro] = useState<string | null>(null)
-  const [salvando, setSalvando] = useState(false)
+  const [erroCarregamento, setErroCarregamento] = useState<string | null>(null)
   const navegar = useNavigate()
+
+  const { erro, salvando, submeter } = useSalvarProduto(
+    (dados) => api.put(`/produtos/${id}`, dados),
+    () => navegar('/produtos'),
+    'Não foi possível salvar o produto.',
+  )
 
   useEffect(() => {
     Promise.all([
@@ -34,29 +41,20 @@ export function EditarProdutoPage() {
         setCategoriaId(produto.categoriaId ?? '')
         setCategorias(resCategorias.categorias)
       })
-      .catch((e) => setErro(e instanceof ApiError ? e.message : 'Não foi possível carregar o produto.'))
+      .catch((e) => setErroCarregamento(e instanceof ApiError ? e.message : 'Não foi possível carregar o produto.'))
       .finally(() => setCarregando(false))
   }, [id])
 
-  async function aoSubmeter(evento: FormEvent) {
+  function aoSubmeter(evento: FormEvent) {
     evento.preventDefault()
-    setErro(null)
-    setSalvando(true)
-    try {
-      await api.put<{ produto: Produto }>(`/produtos/${id}`, {
-        nome,
-        unidade,
-        precoCusto: Number(precoCusto.replace(',', '.')),
-        precoVenda: Number(precoVenda.replace(',', '.')),
-        estoqueMinimo: Number(estoqueMinimo),
-        categoriaId: categoriaId || null,
-      })
-      navegar('/produtos')
-    } catch (e) {
-      setErro(e instanceof ApiError ? e.message : 'Não foi possível salvar o produto.')
-    } finally {
-      setSalvando(false)
-    }
+    submeter({
+      nome,
+      unidade,
+      categoriaId: categoriaId || null,
+      precoCusto: Number(precoCusto.replace(',', '.')),
+      precoVenda: Number(precoVenda.replace(',', '.')),
+      estoqueMinimo: Number(estoqueMinimo),
+    })
   }
 
   if (carregando) {
@@ -89,24 +87,14 @@ export function EditarProdutoPage() {
           onEstoqueMinimoChange={setEstoqueMinimo}
         />
 
-        {erro && <p className="text-sm text-red-400">{erro}</p>}
+        {(erro ?? erroCarregamento) && <p className="text-sm text-red-400">{erro ?? erroCarregamento}</p>}
 
-        <div className="flex gap-3">
-          <button
-            type="submit"
-            disabled={salvando}
-            className="rounded-md bg-brand-accent px-4 py-2 font-medium text-brand-bg hover:bg-brand-accent-hover disabled:opacity-60"
-          >
-            {salvando ? 'Salvando...' : 'Salvar alterações'}
-          </button>
-          <button
-            type="button"
-            onClick={() => navegar('/produtos')}
-            className="rounded-md border border-brand-border px-4 py-2 text-brand-text hover:border-brand-accent"
-          >
-            Cancelar
-          </button>
-        </div>
+        <AcoesFormulario
+          rotuloSalvar="Salvar alterações"
+          rotuloSalvando="Salvando..."
+          salvando={salvando}
+          onCancelar={() => navegar('/produtos')}
+        />
       </form>
     </AppLayout>
   )
