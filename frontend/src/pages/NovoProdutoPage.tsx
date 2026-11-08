@@ -3,9 +3,9 @@ import { useNavigate } from 'react-router-dom'
 import { AcoesFormulario } from '../components/AcoesFormulario'
 import { AppLayout } from '../components/AppLayout'
 import { ProdutoFormCampos } from '../components/ProdutoFormCampos'
-import { useSalvarProduto } from '../hooks/useSalvarProduto'
+import { useSalvarFormulario } from '../hooks/useSalvarFormulario'
 import { api } from '../lib/api'
-import type { Categoria } from '../types'
+import type { Categoria, DadosProduto } from '../types'
 
 export function NovoProdutoPage() {
   const [categorias, setCategorias] = useState<Categoria[]>([])
@@ -17,8 +17,8 @@ export function NovoProdutoPage() {
   const [categoriaId, setCategoriaId] = useState('')
   const navegar = useNavigate()
 
-  const { erro, salvando, submeter } = useSalvarProduto(
-    (dados) => api.post('/produtos', dados),
+  const { erro, salvando, submeter } = useSalvarFormulario(
+    (dados: DadosProduto) => api.post('/produtos', dados),
     () => navegar('/produtos'),
     'Não foi possível cadastrar o produto.',
   )
