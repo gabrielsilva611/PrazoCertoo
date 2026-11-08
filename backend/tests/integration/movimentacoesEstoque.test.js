@@ -101,6 +101,41 @@ describe('POST /produtos/:produtoId/movimentacoes', () => {
     expect(resposta.body.movimentacao.saldoPosterior).toBeLessThan(0);
   });
 
+  test('duas movimentações concorrentes no mesmo produto não se perdem (lost update)', async () => {
+    const produtoConcorrente = await autenticado(request(app).post('/produtos')).send({
+      nome: 'Perfume Concorrência',
+      unidade: 'un',
+      precoCusto: 10,
+      precoVenda: 20,
+      estoqueMinimo: 0,
+    });
+    const idConcorrente = produtoConcorrente.body.produto.id;
+
+    await autenticado(
+      request(app).post(`/produtos/${idConcorrente}/movimentacoes`),
+    ).send({ tipo: 'ENTRADA', quantidade: 100 });
+
+    const [resposta1, resposta2] = await Promise.all([
+      autenticado(request(app).post(`/produtos/${idConcorrente}/movimentacoes`)).send({
+        tipo: 'SAIDA',
+        quantidade: 10,
+      }),
+      autenticado(request(app).post(`/produtos/${idConcorrente}/movimentacoes`)).send({
+        tipo: 'SAIDA',
+        quantidade: 10,
+      }),
+    ]);
+
+    expect(resposta1.status).toBe(201);
+    expect(resposta2.status).toBe(201);
+
+    const produto = await autenticado(request(app).get(`/produtos/${idConcorrente}`));
+    expect(produto.body.produto.saldoAtual).toBe(80);
+
+    await prisma.movimentacaoEstoque.deleteMany({ where: { produtoId: idConcorrente } });
+    await prisma.produto.deleteMany({ where: { id: idConcorrente } });
+  });
+
   test('rejeita quantidade zero para AJUSTE com 400', async () => {
     const resposta = await autenticado(
       request(app).post(`/produtos/${produtoId}/movimentacoes`),

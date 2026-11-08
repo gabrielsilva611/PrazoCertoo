@@ -30,6 +30,8 @@ beforeAll(async () => {
 afterAll(async () => {
   await prisma.parcela.deleteMany({ where: { venda: { negocioId } } });
   await prisma.venda.deleteMany({ where: { negocioId } });
+  await prisma.movimentacaoEstoque.deleteMany({ where: { produto: { negocioId } } });
+  await prisma.produto.deleteMany({ where: { negocioId } });
   await prisma.cliente.deleteMany({ where: { negocioId } });
   await prisma.usuario.deleteMany({ where: { email: emailDono } });
   await prisma.$disconnect();
@@ -73,6 +75,67 @@ describe('POST /vendas', () => {
       dataInicio: diasAtras(0),
     });
     expect(resposta.status).toBe(404);
+  });
+
+  test('venda com produto vinculado debita o estoque (RF26)', async () => {
+    const produto = await autenticado(request(app).post('/produtos')).send({
+      nome: 'Perfume da Venda',
+      unidade: 'un',
+      precoCusto: 20,
+      precoVenda: 50,
+      estoqueMinimo: 0,
+    });
+    const produtoId = produto.body.produto.id;
+    await autenticado(request(app).post(`/produtos/${produtoId}/movimentacoes`)).send({
+      tipo: 'ENTRADA',
+      quantidade: 5,
+    });
+
+    const resposta = await autenticado(request(app).post('/vendas')).send({
+      clienteId,
+      produtoId,
+      descricao: 'Venda com produto',
+      valorTotal: 50,
+      numParcelas: 1,
+      dataInicio: diasAtras(0),
+    });
+
+    expect(resposta.status).toBe(201);
+    const produtoAtualizado = await autenticado(request(app).get(`/produtos/${produtoId}`));
+    expect(produtoAtualizado.body.produto.saldoAtual).toBe(4);
+  });
+
+  test('venda com produto sem estoque exige justificativaEstoque, com 409 (RN10)', async () => {
+    const produto = await autenticado(request(app).post('/produtos')).send({
+      nome: 'Perfume Esgotado',
+      unidade: 'un',
+      precoCusto: 20,
+      precoVenda: 50,
+      estoqueMinimo: 0,
+    });
+    const produtoId = produto.body.produto.id;
+
+    const semJustificativa = await autenticado(request(app).post('/vendas')).send({
+      clienteId,
+      produtoId,
+      valorTotal: 50,
+      numParcelas: 1,
+      dataInicio: diasAtras(0),
+    });
+    expect(semJustificativa.status).toBe(409);
+
+    const comJustificativa = await autenticado(request(app).post('/vendas')).send({
+      clienteId,
+      produtoId,
+      valorTotal: 50,
+      numParcelas: 1,
+      dataInicio: diasAtras(0),
+      justificativaEstoque: 'Cliente levou por encomenda',
+    });
+    expect(comJustificativa.status).toBe(201);
+
+    const produtoAtualizado = await autenticado(request(app).get(`/produtos/${produtoId}`));
+    expect(produtoAtualizado.body.produto.saldoAtual).toBe(-1);
   });
 
   test('rejeita dados inválidos (valor negativo) com 400', async () => {

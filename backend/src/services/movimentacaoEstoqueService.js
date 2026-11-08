@@ -26,26 +26,17 @@ async function registrar(negocioId, produtoId, dados) {
   }
 
   const delta = calcularDelta(dados.tipo, dados.quantidade);
-  const saldoPosterior = produto.saldoAtual + delta;
 
-  // RN10 (mesmo critério já usado na Venda): estoque negativo não é
-  // bloqueado, mas exige motivo explícito antes de confirmar.
-  if (saldoPosterior < 0 && !dados.motivo) {
-    throw new AppError(
-      'Esta movimentação deixaria o estoque negativo. Informe "motivo" para confirmar mesmo assim.',
-      409,
-    );
-  }
-
+  // RN10 é checada dentro do repositório, depois do increment atômico do
+  // saldo — checar aqui, com o saldo lido nesta linha, reabriria a mesma
+  // corrida que causava a sobrescrita de saldoAtual.
   return movimentacaoRepository.registrar({
     produtoId,
     usuarioId: dados.usuarioId,
-    fornecedorId: dados.fornecedorId ?? null,
+    fornecedorId: dados.fornecedorId,
     tipo: dados.tipo,
-    quantidade: Math.abs(delta),
-    saldoAnterior: produto.saldoAtual,
-    saldoPosterior,
-    motivo: dados.motivo ?? null,
+    delta,
+    motivo: dados.motivo,
   });
 }
 

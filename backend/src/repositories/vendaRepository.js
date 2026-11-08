@@ -1,4 +1,5 @@
 const prisma = require('../lib/prisma');
+const AppError = require('../lib/AppError');
 
 function buscarPorId(negocioId, id) {
   return prisma.venda.findFirst({
@@ -16,7 +17,12 @@ function listarPorNegocio(negocioId) {
 }
 
 // RF08-RF10, RF26: cria a venda, as parcelas e (se houver produto vinculado)
-// a movimentação de saída de estoque — tudo em uma transação só.
+// a movimentação de saída de estoque — tudo em uma transação só. O saldo é
+// alterado com "increment" (delta), não com um SET do valor calculado no
+// service: isso serializa vendas concorrentes do mesmo produto na própria
+// linha do Postgres em vez de uma sobrescrever o resultado da outra. A
+// checagem de estoque insuficiente (RN10) por isso só pode acontecer aqui,
+// depois do increment.
 async function criarComParcelas({ venda, parcelas, movimentacaoEstoque }) {
   return prisma.$transaction(async (tx) => {
     const vendaCriada = await tx.venda.create({ data: venda });
@@ -26,11 +32,35 @@ async function criarComParcelas({ venda, parcelas, movimentacaoEstoque }) {
     });
 
     if (movimentacaoEstoque) {
-      await tx.produto.update({
+      const produto = await tx.produto.update({
         where: { id: movimentacaoEstoque.produtoId },
-        data: { saldoAtual: movimentacaoEstoque.saldoPosterior },
+        data: { saldoAtual: { increment: movimentacaoEstoque.delta } },
       });
-      await tx.movimentacaoEstoque.create({ data: movimentacaoEstoque });
+
+      const saldoPosterior = produto.saldoAtual;
+      const saldoAnterior = saldoPosterior - movimentacaoEstoque.delta;
+      const saldoInsuficiente = saldoPosterior < 0;
+
+      if (saldoInsuficiente && !movimentacaoEstoque.justificativaEstoque) {
+        throw new AppError(
+          'Estoque insuficiente para este produto. Envie "justificativaEstoque" para confirmar a venda mesmo assim.',
+          409,
+        );
+      }
+
+      await tx.movimentacaoEstoque.create({
+        data: {
+          produtoId: movimentacaoEstoque.produtoId,
+          usuarioId: movimentacaoEstoque.usuarioId,
+          tipo: movimentacaoEstoque.tipo,
+          quantidade: Math.abs(movimentacaoEstoque.delta),
+          saldoAnterior,
+          saldoPosterior,
+          motivo: saldoInsuficiente
+            ? `Venda com estoque insuficiente: ${movimentacaoEstoque.justificativaEstoque}`
+            : 'Venda a prazo',
+        },
+      });
     }
 
     return tx.venda.findUniqueOrThrow({
