@@ -40,4 +40,5 @@ export const api = {
     requisitar<T>(caminho, { method: 'PUT', body: JSON.stringify(corpo) }),
   patch: <T>(caminho: string, corpo?: unknown) =>
     requisitar<T>(caminho, { method: 'PATCH', body: JSON.stringify(corpo) }),
+  delete: <T>(caminho: string) => requisitar<T>(caminho, { method: 'DELETE' }),
 }

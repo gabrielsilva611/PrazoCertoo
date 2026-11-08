@@ -59,6 +59,12 @@ export interface Categoria {
   descricao: string | null
 }
 
+export interface Fornecedor {
+  id: string
+  nome: string
+  contato: string | null
+}
+
 export interface Produto {
   id: string
   categoriaId: string | null
