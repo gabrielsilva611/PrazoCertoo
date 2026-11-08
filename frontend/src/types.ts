@@ -104,3 +104,35 @@ export interface Venda {
   criadoEm: string
   parcelas: Parcela[]
 }
+
+export interface HistoricoCobranca {
+  id: string
+  parcelaId: string | null
+  mensagem: string
+  canal: string
+  enviadoEm: string
+}
+
+// GET /clientes/:id — histórico completo (RF06), além do que ClienteBasico já traz.
+export interface ClienteDetalhe extends ClienteBasico {
+  score: Score
+  vendas: Venda[]
+  historicoCobrancas: HistoricoCobranca[]
+}
+
+export interface DadosProduto {
+  nome: string
+  unidade: string
+  categoriaId?: string | null
+  precoCusto: number
+  precoVenda: number
+  estoqueMinimo: number
+}
+
+export interface DadosCliente {
+  nome: string
+  telefone: string
+  email?: string
+  cpf?: string
+  observacoes?: string
+}

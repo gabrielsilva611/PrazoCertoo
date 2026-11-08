@@ -66,12 +66,13 @@ export function ClientesPage() {
               <th className="px-4 py-3 font-medium">Cliente</th>
               <th className="px-4 py-3 font-medium">Telefone</th>
               <th className="px-4 py-3 font-medium">Score</th>
+              <th className="px-4 py-3 font-medium"></th>
             </tr>
           </thead>
           <tbody>
             {carregando && (
               <tr>
-                <td colSpan={3} className="px-4 py-6 text-center text-brand-muted">
+                <td colSpan={4} className="px-4 py-6 text-center text-brand-muted">
                   Carregando...
                 </td>
               </tr>
@@ -79,7 +80,7 @@ export function ClientesPage() {
 
             {!carregando && erro && (
               <tr>
-                <td colSpan={3} className="px-4 py-6 text-center text-red-400">
+                <td colSpan={4} className="px-4 py-6 text-center text-red-400">
                   {erro}
                 </td>
               </tr>
@@ -87,7 +88,7 @@ export function ClientesPage() {
 
             {!carregando && !erro && filtrados.length === 0 && (
               <tr>
-                <td colSpan={3} className="px-4 py-6 text-center text-brand-muted">
+                <td colSpan={4} className="px-4 py-6 text-center text-brand-muted">
                   Nenhum cliente encontrado.
                 </td>
               </tr>
@@ -95,10 +96,19 @@ export function ClientesPage() {
 
             {filtrados.map((cliente) => (
               <tr key={cliente.id} className="border-t border-brand-border">
-                <td className="px-4 py-3">{cliente.nome}</td>
+                <td className="px-4 py-3">
+                  <Link to={`/clientes/${cliente.id}`} className="hover:text-brand-accent hover:underline">
+                    {cliente.nome}
+                  </Link>
+                </td>
                 <td className="px-4 py-3 text-brand-muted">{cliente.telefone}</td>
                 <td className="px-4 py-3">
                   <ScoreBadge score={cliente.score} />
+                </td>
+                <td className="px-4 py-3 text-right">
+                  <Link to={`/clientes/${cliente.id}/editar`} className="text-brand-accent hover:underline">
+                    Editar
+                  </Link>
                 </td>
               </tr>
             ))}

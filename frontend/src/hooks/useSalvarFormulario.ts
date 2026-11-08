@@ -1,24 +1,15 @@
 import { useState } from 'react'
 import { ApiError } from '../lib/api'
 
-export interface DadosProduto {
-  nome: string
-  unidade: string
-  categoriaId?: string | null
-  precoCusto: number
-  precoVenda: number
-  estoqueMinimo: number
-}
-
-export function useSalvarProduto(
-  salvar: (dados: DadosProduto) => Promise<unknown>,
+export function useSalvarFormulario<T>(
+  salvar: (dados: T) => Promise<unknown>,
   aoSucesso: () => void,
   mensagemErroPadrao: string,
 ) {
   const [erro, setErro] = useState<string | null>(null)
   const [salvando, setSalvando] = useState(false)
 
-  async function submeter(dados: DadosProduto) {
+  async function submeter(dados: T) {
     setErro(null)
     setSalvando(true)
     try {

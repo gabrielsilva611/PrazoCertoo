@@ -3,9 +3,9 @@ import { useNavigate, useParams } from 'react-router-dom'
 import { AcoesFormulario } from '../components/AcoesFormulario'
 import { AppLayout } from '../components/AppLayout'
 import { ProdutoFormCampos } from '../components/ProdutoFormCampos'
-import { useSalvarProduto } from '../hooks/useSalvarProduto'
+import { useSalvarFormulario } from '../hooks/useSalvarFormulario'
 import { api, ApiError } from '../lib/api'
-import type { Categoria, Produto } from '../types'
+import type { Categoria, DadosProduto, Produto } from '../types'
 
 export function EditarProdutoPage() {
   const { id } = useParams<{ id: string }>()
@@ -20,8 +20,8 @@ export function EditarProdutoPage() {
   const [erroCarregamento, setErroCarregamento] = useState<string | null>(null)
   const navegar = useNavigate()
 
-  const { erro, salvando, submeter } = useSalvarProduto(
-    (dados) => api.put(`/produtos/${id}`, dados),
+  const { erro, salvando, submeter } = useSalvarFormulario(
+    (dados: DadosProduto) => api.put(`/produtos/${id}`, dados),
     () => navegar('/produtos'),
     'Não foi possível salvar o produto.',
   )
