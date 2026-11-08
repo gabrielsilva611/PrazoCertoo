@@ -57,6 +57,7 @@ function montarRespostaLogin(usuario) {
       nome: usuario.nome,
       email: usuario.email,
       perfil: usuario.perfil,
+      corDestaque: usuario.corDestaque,
     },
   };
 }
