@@ -9,6 +9,8 @@ const ITENS_MENU = [
   { rotulo: 'Produtos', para: '/produtos' },
   { rotulo: 'Categorias', para: '/categorias' },
   { rotulo: 'Fornecedores', para: '/fornecedores' },
+  // Configurações do negócio (ex: cor de destaque) são exclusivas do Dono, como no backend.
+  { rotulo: 'Configurações', para: '/configuracoes', somenteDono: true },
 ]
 
 function linkClasse({ isActive }: { isActive: boolean }) {
@@ -32,7 +34,7 @@ export function AppLayout({ children }: { children: ReactNode }) {
         </div>
 
         <nav className="mt-8 flex flex-col gap-1">
-          {ITENS_MENU.map((item) => (
+          {ITENS_MENU.filter((item) => !item.somenteDono || usuario?.perfil === 'DONO').map((item) => (
             <NavLink key={item.para} to={item.para} end className={linkClasse}>
               {item.rotulo}
             </NavLink>

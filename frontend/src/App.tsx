@@ -4,6 +4,7 @@ import { RotaProtegida } from './components/RotaProtegida'
 import { CategoriasPage } from './pages/CategoriasPage'
 import { ClienteDetalhePage } from './pages/ClienteDetalhePage'
 import { ClientesPage } from './pages/ClientesPage'
+import { ConfiguracoesPage } from './pages/ConfiguracoesPage'
 import { DashboardPage } from './pages/DashboardPage'
 import { EditarClientePage } from './pages/EditarClientePage'
 import { EditarProdutoPage } from './pages/EditarProdutoPage'
@@ -37,6 +38,7 @@ export function App() {
       <Route path="/produtos/:id/editar" element={protegida(<EditarProdutoPage />)} />
       <Route path="/categorias" element={protegida(<CategoriasPage />)} />
       <Route path="/fornecedores" element={protegida(<FornecedoresPage />)} />
+      <Route path="/configuracoes" element={protegida(<ConfiguracoesPage />)} />
     </Routes>
   )
 }

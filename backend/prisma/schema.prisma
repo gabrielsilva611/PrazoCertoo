@@ -32,13 +32,15 @@ enum StatusInventario {
 
 // RF01–RF03: autenticação e RBAC (DONO acesso total, FUNCIONARIO restrito)
 model Usuario {
-  id        String   @id @default(uuid()) @db.Uuid
-  negocioId String   @map("negocio_id") @db.Uuid
-  nome      String   @db.VarChar(150)
-  email     String   @unique @db.VarChar(150)
-  senhaHash String   @map("senha_hash") @db.VarChar(255)
-  perfil    Perfil
-  criadoEm  DateTime @default(now()) @map("criado_em")
+  id          String   @id @default(uuid()) @db.Uuid
+  negocioId   String   @map("negocio_id") @db.Uuid
+  nome        String   @db.VarChar(150)
+  email       String   @unique @db.VarChar(150)
+  senhaHash   String   @map("senha_hash") @db.VarChar(255)
+  perfil      Perfil
+  // Cor de destaque do tema, customizável pelo Dono (pedido de cliente real).
+  corDestaque String   @default("#22c55e") @map("cor_destaque") @db.VarChar(7)
+  criadoEm    DateTime @default(now()) @map("criado_em")
 
   negocio Usuario   @relation("NegocioEquipe", fields: [negocioId], references: [id])
   equipe  Usuario[] @relation("NegocioEquipe")

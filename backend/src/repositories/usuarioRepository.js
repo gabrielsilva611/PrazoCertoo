@@ -12,4 +12,8 @@ function criar(dados) {
   return prisma.usuario.create({ data: dados });
 }
 
-module.exports = { buscarPorEmail, buscarPorId, criar };
+function atualizarCorDestaque(id, corDestaque) {
+  return prisma.usuario.update({ where: { id }, data: { corDestaque } });
+}
+
+module.exports = { buscarPorEmail, buscarPorId, criar, atualizarCorDestaque };

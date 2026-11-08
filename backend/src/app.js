@@ -8,6 +8,7 @@ const categoriaRoutes = require('./routes/categoriaRoutes');
 const fornecedorRoutes = require('./routes/fornecedorRoutes');
 const produtoRoutes = require('./routes/produtoRoutes');
 const inventarioRoutes = require('./routes/inventarioRoutes');
+const configuracaoRoutes = require('./routes/configuracaoRoutes');
 const { tratarErros } = require('./middlewares/errorHandler');
 
 if (process.env.NODE_ENV === 'production' && !process.env.FRONTEND_URL) {
@@ -30,6 +31,7 @@ app.use('/categorias', categoriaRoutes);
 app.use('/fornecedores', fornecedorRoutes);
 app.use('/produtos', produtoRoutes);
 app.use('/inventarios', inventarioRoutes);
+app.use('/configuracoes', configuracaoRoutes);
 
 app.use(tratarErros);
 
