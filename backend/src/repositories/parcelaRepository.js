@@ -10,4 +10,17 @@ function listarPorCliente(clienteId, desde) {
   });
 }
 
-module.exports = { listarPorCliente };
+// Mesma busca, mas para vários clientes de uma vez (1 query em vez de N) —
+// usado pela listagem de clientes, que calcula o score de todos eles.
+// Cada parcela sai com venda.clienteId pra permitir agrupar por cliente.
+function listarPorClientes(clienteIds, desde) {
+  return prisma.parcela.findMany({
+    where: {
+      venda: { clienteId: { in: clienteIds } },
+      ...(desde && { vencimento: { gte: desde } }),
+    },
+    include: { venda: { select: { clienteId: true } } },
+  });
+}
+
+module.exports = { listarPorCliente, listarPorClientes };
