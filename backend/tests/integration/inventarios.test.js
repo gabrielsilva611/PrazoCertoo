@@ -36,7 +36,7 @@ beforeAll(async () => {
 afterAll(async () => {
   await prisma.inventarioItem.deleteMany({ where: { inventario: { negocioId } } });
   await prisma.inventario.deleteMany({ where: { negocioId } });
-  await prisma.movimentacaoEstoque.deleteMany({ where: { produtoId } });
+  await prisma.movimentacaoEstoque.deleteMany({ where: { produto: { negocioId } } });
   await prisma.produto.deleteMany({ where: { negocioId } });
   await prisma.usuario.deleteMany({ where: { negocioId } });
   await prisma.$disconnect();
@@ -177,5 +177,73 @@ describe('validações e isolamento', () => {
   test('rejeita sem token com 401', async () => {
     const resposta = await request(app).get('/inventarios');
     expect(resposta.status).toBe(401);
+  });
+});
+
+describe('corrida entre registrar item e concluir (regressão)', () => {
+  test('a divergência nunca fica de fora do fechamento: ou vira movimentação, ou o item é rejeitado', async () => {
+    // O describe anterior deixa um inventário ABERTO sem itens (teste de
+    // "concluir sem nenhum item" não consegue fechá-lo) — fecha aqui pra
+    // este teste poder abrir um novo com POST /inventarios.
+    const lista = await autenticado(request(app).get('/inventarios'));
+    const pendente = lista.body.inventarios.find((i) => i.status === 'ABERTO');
+    if (pendente) {
+      const produtoAtual = await autenticado(request(app).get(`/produtos/${produtoId}`));
+      await autenticado(request(app).put(`/inventarios/${pendente.id}/itens`)).send({
+        produtoId,
+        saldoFisico: produtoAtual.body.produto.saldoAtual,
+      });
+      await autenticado(request(app).patch(`/inventarios/${pendente.id}/concluir`));
+    }
+
+    const produtoBase = await autenticado(request(app).post('/produtos')).send({
+      nome: 'Perfume Base Corrida',
+      unidade: 'un',
+      precoCusto: 10,
+      precoVenda: 20,
+      estoqueMinimo: 0,
+    });
+    const produtoConcorrente = await autenticado(request(app).post('/produtos')).send({
+      nome: 'Perfume Corrida Inventário',
+      unidade: 'un',
+      precoCusto: 10,
+      precoVenda: 20,
+      estoqueMinimo: 0,
+    });
+    const idProdutoConcorrente = produtoConcorrente.body.produto.id;
+
+    const aberto = await autenticado(request(app).post('/inventarios'));
+    const idInventario = aberto.body.inventario.id;
+
+    // Já deixa um item contado antes da corrida, pra concluir() não falhar
+    // por "nenhum item" — queremos isolar só a corrida entre o segundo item
+    // e a conclusão, não esse outro caminho de validação.
+    await autenticado(request(app).put(`/inventarios/${idInventario}/itens`)).send({
+      produtoId: produtoBase.body.produto.id,
+      saldoFisico: 0,
+    });
+
+    const [respostaItem, respostaConcluir] = await Promise.all([
+      autenticado(request(app).put(`/inventarios/${idInventario}/itens`)).send({
+        produtoId: idProdutoConcorrente,
+        saldoFisico: 5,
+        justificativa: 'Contagem concorrente com a conclusão',
+      }),
+      autenticado(request(app).patch(`/inventarios/${idInventario}/concluir`)),
+    ]);
+
+    expect(respostaConcluir.status).toBe(200);
+
+    if (respostaItem.status === 200) {
+      const movimentacoes = await autenticado(
+        request(app).get(`/produtos/${idProdutoConcorrente}/movimentacoes`),
+      );
+      const temMovimentacao = movimentacoes.body.movimentacoes.some(
+        (m) => m.tipo === 'INVENTARIO' && m.quantidade === 5,
+      );
+      expect(temMovimentacao).toBe(true);
+    } else {
+      expect(respostaItem.status).toBe(409);
+    }
   });
 });
