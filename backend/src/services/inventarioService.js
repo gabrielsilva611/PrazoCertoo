@@ -25,11 +25,13 @@ async function buscarDetalhe(negocioId, id) {
 }
 
 // RF28: registra (ou corrige) a contagem física de um produto no inventário aberto.
+// A checagem de status ABERTO é feita de forma atômica dentro da transação
+// do repositório (travando a linha do inventário) — não aqui, porque ler o
+// status antes e só gravar o item depois é a mesma corrida check-then-act
+// que permitia um item ser salvo num inventário concluído no meio do
+// caminho, sem nunca virar movimentação de estoque.
 async function registrarItem(negocioId, inventarioId, dados) {
-  const inventario = await buscarOuFalhar(negocioId, inventarioId);
-  if (inventario.status !== 'ABERTO') {
-    throw new AppError('Este inventário já foi concluído e não pode mais ser alterado.', 409);
-  }
+  await buscarOuFalhar(negocioId, inventarioId);
 
   const produto = await produtoRepository.buscarPorId(negocioId, dados.produtoId);
   if (!produto) {
@@ -62,6 +64,11 @@ async function registrarItem(negocioId, inventarioId, dados) {
 // delta é aplicado com "increment" dentro da transação do repositório — não
 // lemos mais produto.saldoAtual aqui pra montar um saldoPosterior absoluto,
 // porque essa leitura fora da transação é o que causava a corrida.
+//
+// A lista de itens também não é mais montada aqui: o repositório trava a
+// linha do inventário e só então relê os itens, já dentro da transação —
+// senão um registrarItem() que ganhasse a corrida contra esta conclusão
+// ficaria de fora do "ajustes" montado com os dados velhos de antes do lock.
 async function concluir(negocioId, inventarioId, usuarioId) {
   const inventario = await buscarOuFalhar(negocioId, inventarioId);
   if (inventario.status !== 'ABERTO') {
@@ -71,20 +78,7 @@ async function concluir(negocioId, inventarioId, usuarioId) {
     throw new AppError('Registre ao menos um item antes de concluir o inventário.', 409);
   }
 
-  const produtoIds = inventario.itens.map((item) => item.produtoId);
-  const produtos = await produtoRepository.listarPorIdsIncluindoInativos(negocioId, produtoIds);
-  const idsExistentes = new Set(produtos.map((produto) => produto.id));
-
-  const ajustes = inventario.itens
-    .filter((item) => idsExistentes.has(item.produtoId) && item.diferenca !== 0)
-    .map((item) => ({
-      produtoId: item.produtoId,
-      usuarioId,
-      delta: item.diferenca,
-      motivo: item.justificativa ?? `Ajuste por contagem de inventário (${inventarioId})`,
-    }));
-
-  return inventarioRepository.concluir(inventarioId, ajustes);
+  return inventarioRepository.concluir(negocioId, inventarioId, usuarioId);
 }
 
 async function buscarOuFalhar(negocioId, id) {
