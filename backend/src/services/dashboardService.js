@@ -13,9 +13,9 @@ function inicioDoMes(data) {
   return new Date(inicioEmUtcDoDiaLocal + OFFSET_BRASIL_MS);
 }
 
-// RF16: dashboard unificado com os indicadores de recebimento do negócio.
-// A parte de estoque (capital imobilizado, produtos críticos) entra quando
-// o Módulo 6 existir.
+// RF16: dashboard com os indicadores de recebimento do negócio. Só isso —
+// os números de estoque (capital imobilizado, produtos abaixo do mínimo)
+// ficam no relatório de estoque (relatorioService.relatorioEstoque), não aqui.
 async function obterIndicadores(negocioId) {
   const agora = new Date();
 
