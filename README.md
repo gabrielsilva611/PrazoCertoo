@@ -55,6 +55,17 @@ Se for a primeira vez rodando contra um banco de teste novo, aplique as migratio
 DATABASE_URL="<url do banco de teste>" npx prisma migrate deploy
 ```
 
+## Observabilidade (Prometheus + Grafana)
+
+O backend expõe métricas em `/metrics` (formato Prometheus). Pra ver tudo rodando localmente:
+
+```bash
+docker compose up --build
+```
+
+- Prometheus: http://localhost:9090 (confira em `/targets` se o backend está `UP`)
+- Grafana: http://localhost:3001 (login `admin`/`admin`) — já vem com o dashboard "PrazoCerto — Backend" provisionado, sem precisar configurar nada manualmente.
+
 ## Modelo de dados
 
 O schema (`backend/prisma/schema.prisma`) implementa o modelo de dados do RFC do projeto, dividido em dois módulos:
