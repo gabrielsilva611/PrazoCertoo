@@ -20,6 +20,7 @@ export function ClienteDetalhePage() {
   const [carregando, setCarregando] = useState(true)
   const [erro, setErro] = useState<string | null>(null)
   const [desativando, setDesativando] = useState(false)
+  const [excluindo, setExcluindo] = useState(false)
 
   useEffect(() => {
     api
@@ -38,6 +39,20 @@ export function ClienteDetalhePage() {
     } catch (e) {
       setErro(e instanceof ApiError ? e.message : 'Não foi possível desativar o cliente.')
       setDesativando(false)
+    }
+  }
+
+  async function aoExcluir() {
+    if (!window.confirm('Excluir este cliente para sempre? Vendas, parcelas e cobranças dele também serão apagadas — essa ação não pode ser desfeita.')) {
+      return
+    }
+    setExcluindo(true)
+    try {
+      await api.delete(`/clientes/${id}`)
+      navegar('/clientes')
+    } catch (e) {
+      setErro(e instanceof ApiError ? e.message : 'Não foi possível excluir o cliente.')
+      setExcluindo(false)
     }
   }
 
@@ -64,6 +79,7 @@ export function ClienteDetalhePage() {
     (soma, venda) => soma + venda.parcelas.filter((p) => p.status === 'ATRASADO').length,
     0,
   )
+  const dividaQuitada = cliente.vendas.every((venda) => venda.parcelas.every((p) => p.status === 'PAGO'))
 
   return (
     <AppLayout>
@@ -85,11 +101,21 @@ export function ClienteDetalhePage() {
           <Link to={`/clientes/${id}/editar`} className="text-sm text-brand-accent hover:underline">
             Editar
           </Link>
+          {usuario?.perfil === 'DONO' && dividaQuitada && (
+            <button
+              onClick={aoExcluir}
+              disabled={excluindo}
+              title="Dívida quitada — já pode excluir este cliente de vez"
+              className="text-sm text-red-400 hover:underline disabled:opacity-60"
+            >
+              {excluindo ? 'Excluindo...' : 'Excluir'}
+            </button>
+          )}
           {usuario?.perfil === 'DONO' && cliente.ativo && (
             <button
               onClick={aoDesativar}
               disabled={desativando}
-              className="text-sm text-red-400 hover:underline disabled:opacity-60"
+              className="text-sm text-brand-muted hover:underline disabled:opacity-60"
             >
               {desativando ? 'Desativando...' : 'Desativar'}
             </button>

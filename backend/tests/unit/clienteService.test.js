@@ -3,7 +3,7 @@ jest.mock('../../src/repositories/parcelaRepository');
 
 const clienteRepository = require('../../src/repositories/clienteRepository');
 const parcelaRepository = require('../../src/repositories/parcelaRepository');
-const { listar } = require('../../src/services/clienteService');
+const { listar, excluir } = require('../../src/services/clienteService');
 
 const AGORA = new Date('2026-06-15T12:00:00Z');
 const DIA_EM_MS = 1000 * 60 * 60 * 24;
@@ -78,5 +78,52 @@ describe('clienteService.listar', () => {
     const clientes = await listar('negocio-1');
     expect(clientes).toEqual([]);
     expect(parcelaRepository.listarPorClientes).not.toHaveBeenCalled();
+  });
+});
+
+describe('clienteService.excluir', () => {
+  test('exclui quando todas as parcelas de todas as vendas já foram pagas', async () => {
+    clienteRepository.buscarComHistorico.mockResolvedValue({
+      id: 'cliente-1',
+      vendas: [
+        { parcelas: [{ pagoEm: new Date() }, { pagoEm: new Date() }] },
+        { parcelas: [{ pagoEm: new Date() }] },
+      ],
+    });
+
+    await excluir('negocio-1', 'cliente-1');
+
+    expect(clienteRepository.excluir).toHaveBeenCalledWith('negocio-1', 'cliente-1');
+  });
+
+  test('exclui um cliente sem nenhuma venda', async () => {
+    clienteRepository.buscarComHistorico.mockResolvedValue({ id: 'cliente-1', vendas: [] });
+
+    await excluir('negocio-1', 'cliente-1');
+
+    expect(clienteRepository.excluir).toHaveBeenCalledWith('negocio-1', 'cliente-1');
+  });
+
+  test('recusa excluir quando há parcela em aberto em qualquer venda', async () => {
+    clienteRepository.buscarComHistorico.mockResolvedValue({
+      id: 'cliente-1',
+      vendas: [
+        { parcelas: [{ pagoEm: new Date() }] },
+        { parcelas: [{ pagoEm: null }] },
+      ],
+    });
+
+    await expect(excluir('negocio-1', 'cliente-1')).rejects.toMatchObject({
+      message: 'Não é possível excluir: há parcelas em aberto para este cliente.',
+      status: 400,
+    });
+    expect(clienteRepository.excluir).not.toHaveBeenCalled();
+  });
+
+  test('lança 404 quando o cliente não existe no negócio', async () => {
+    clienteRepository.buscarComHistorico.mockResolvedValue(null);
+
+    await expect(excluir('negocio-1', 'cliente-x')).rejects.toMatchObject({ status: 404 });
+    expect(clienteRepository.excluir).not.toHaveBeenCalled();
   });
 });

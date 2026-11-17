@@ -13,5 +13,7 @@ router.post('/', clienteController.criar);
 router.put('/:id', clienteController.atualizar);
 // RN04: desativação é uma forma de remoção — reservada ao Dono, como excluir registros.
 router.patch('/:id/desativar', permitir('DONO'), clienteController.desativar);
+// Exclusão de verdade: só o Dono, e só depois de toda parcela quitada (checado no service).
+router.delete('/:id', permitir('DONO'), clienteController.excluir);
 
 module.exports = router;
