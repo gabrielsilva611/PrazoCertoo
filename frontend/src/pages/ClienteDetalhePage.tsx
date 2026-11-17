@@ -52,7 +52,7 @@ export function ClienteDetalhePage() {
   if (!cliente) {
     return (
       <AppLayout>
-        <p className="text-sm text-red-600">{erro ?? 'Cliente não encontrado.'}</p>
+        <p className="text-sm text-red-400">{erro ?? 'Cliente não encontrado.'}</p>
         <Link to="/clientes" className="mt-4 inline-block text-sm text-brand-accent hover:underline">
           ← Voltar para Clientes
         </Link>
@@ -72,7 +72,7 @@ export function ClienteDetalhePage() {
       </Link>
       <div className="mt-2 flex items-center justify-between">
         <div>
-          <h1 className="font-display text-3xl text-brand-text">
+          <h1 className="text-2xl font-bold tracking-tight text-brand-text">
             {cliente.nome} {!cliente.ativo && <span className="text-lg text-brand-muted">(inativo)</span>}
           </h1>
           <p className="text-sm text-brand-muted">
@@ -89,7 +89,7 @@ export function ClienteDetalhePage() {
             <button
               onClick={aoDesativar}
               disabled={desativando}
-              className="text-sm text-red-600 hover:underline disabled:opacity-60"
+              className="text-sm text-red-400 hover:underline disabled:opacity-60"
             >
               {desativando ? 'Desativando...' : 'Desativar'}
             </button>
@@ -97,7 +97,7 @@ export function ClienteDetalhePage() {
         </div>
       </div>
 
-      {erro && <p className="mt-4 text-sm text-red-600">{erro}</p>}
+      {erro && <p className="mt-4 text-sm text-red-400">{erro}</p>}
 
       {cliente.observacoes && (
         <p className="mt-4 rounded-lg border border-brand-border bg-brand-surface/40 p-3 text-sm text-brand-muted">

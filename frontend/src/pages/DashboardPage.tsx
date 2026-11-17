@@ -84,11 +84,11 @@ export function DashboardPage() {
 
   return (
     <AppLayout>
-      <h1 className="font-display text-3xl text-brand-text">Dashboard</h1>
+      <h1 className="text-2xl font-bold tracking-tight text-brand-text">Dashboard</h1>
       <p className="text-sm text-brand-muted">Bem-vindo, {usuario?.nome}</p>
 
       {carregando && <p className="mt-8 text-sm text-brand-muted">Carregando...</p>}
-      {erro && <p className="mt-4 text-sm text-red-600">{erro}</p>}
+      {erro && <p className="mt-4 text-sm text-red-400">{erro}</p>}
 
       {!carregando && indicadores && (
         <EstatisticasFaixa

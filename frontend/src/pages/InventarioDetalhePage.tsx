@@ -89,7 +89,7 @@ export function InventarioDetalhePage() {
   if (!inventario) {
     return (
       <AppLayout>
-        <p className="text-sm text-red-600">{erro ?? 'Inventário não encontrado.'}</p>
+        <p className="text-sm text-red-400">{erro ?? 'Inventário não encontrado.'}</p>
         <Link to="/inventario" className="mt-4 inline-block text-sm text-brand-accent hover:underline">
           ← Voltar para Inventário
         </Link>
@@ -106,7 +106,7 @@ export function InventarioDetalhePage() {
       </Link>
       <div className="mt-2 flex items-center justify-between">
         <div>
-          <h1 className="font-display text-3xl text-brand-text">
+          <h1 className="text-2xl font-bold tracking-tight text-brand-text">
             Inventário de {formatoDataHora.format(new Date(inventario.iniciadoEm))}
           </h1>
           <div className="mt-1.5">
@@ -117,14 +117,14 @@ export function InventarioDetalhePage() {
           <button
             onClick={aoConcluir}
             disabled={concluindo || inventario.itens.length === 0}
-            className="rounded-lg bg-brand-accent px-4 py-2 text-sm font-medium text-white hover:bg-brand-accent-hover disabled:opacity-60"
+            className="rounded-lg bg-brand-accent px-4 py-2 text-sm font-medium text-brand-accent-foreground hover:bg-brand-accent-hover disabled:opacity-60"
           >
             {concluindo ? 'Concluindo...' : 'Concluir inventário'}
           </button>
         )}
       </div>
 
-      {erro && <p className="mt-4 text-sm text-red-600">{erro}</p>}
+      {erro && <p className="mt-4 text-sm text-red-400">{erro}</p>}
 
       <div className={emAberto ? 'mt-8 grid grid-cols-1 gap-6 lg:grid-cols-[360px_1fr]' : 'mt-8'}>
         {emAberto && (
@@ -168,7 +168,7 @@ export function InventarioDetalhePage() {
             </FormField>
 
             {diferencaPrevia !== null && diferencaPrevia !== 0 && (
-              <p className="text-xs text-amber-700">
+              <p className="text-xs text-amber-400">
                 Diferença de {diferencaPrevia > 0 ? '+' : ''}
                 {diferencaPrevia} em relação ao sistema — informe a justificativa abaixo.
               </p>
@@ -187,7 +187,7 @@ export function InventarioDetalhePage() {
             <button
               type="submit"
               disabled={registrando}
-              className="rounded-lg bg-brand-accent px-4 py-2 text-sm font-medium text-white hover:bg-brand-accent-hover disabled:opacity-60"
+              className="rounded-lg bg-brand-accent px-4 py-2 text-sm font-medium text-brand-accent-foreground hover:bg-brand-accent-hover disabled:opacity-60"
             >
               {registrando ? 'Registrando...' : 'Registrar contagem'}
             </button>
@@ -221,7 +221,7 @@ export function InventarioDetalhePage() {
                   <td className="px-4 py-3 text-brand-muted">{item.saldoSistema}</td>
                   <td className="px-4 py-3">{item.saldoFisico}</td>
                   <td className="px-4 py-3">
-                    <span className={item.diferenca === 0 ? 'text-brand-muted' : 'font-medium text-amber-700'}>
+                    <span className={item.diferenca === 0 ? 'text-brand-muted' : 'font-medium text-amber-400'}>
                       {item.diferenca > 0 ? '+' : ''}
                       {item.diferenca}
                     </span>

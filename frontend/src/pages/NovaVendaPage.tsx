@@ -80,7 +80,7 @@ export function NovaVendaPage() {
 
   return (
     <AppLayout>
-      <h1 className="font-display text-3xl text-brand-text">Nova Venda a Prazo</h1>
+      <h1 className="text-2xl font-bold tracking-tight text-brand-text">Nova Venda a Prazo</h1>
       <p className="text-sm text-brand-muted">Preenche os dados do acordo comercial</p>
 
       <div className="mt-6 grid grid-cols-1 gap-6 lg:grid-cols-[1fr_320px]">
@@ -191,13 +191,13 @@ export function NovaVendaPage() {
             </FormField>
           </div>
 
-          {erro && <p className="mt-4 text-sm text-red-600">{erro}</p>}
+          {erro && <p className="mt-4 text-sm text-red-400">{erro}</p>}
 
           <div className="mt-6 flex gap-3">
             <button
               type="submit"
               disabled={salvando}
-              className="rounded-lg bg-brand-accent px-4 py-2 font-medium text-white hover:bg-brand-accent-hover disabled:opacity-60"
+              className="rounded-lg bg-brand-accent px-4 py-2 font-medium text-brand-accent-foreground hover:bg-brand-accent-hover disabled:opacity-60"
             >
               {salvando ? 'Salvando...' : 'Registrar Venda'}
             </button>

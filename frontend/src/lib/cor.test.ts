@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { escurecer } from './cor'
+import { corTextoLegivel, escurecer } from './cor'
 
 describe('escurecer', () => {
   it('escurece cada canal RGB proporcionalmente ao fator', () => {
@@ -17,5 +17,19 @@ describe('escurecer', () => {
   it('preenche cada canal com dois dígitos hexadecimais', () => {
     const resultado = escurecer('#0a0a0a', 0.1)
     expect(resultado).toMatch(/^#[0-9a-f]{6}$/)
+  })
+})
+
+describe('corTextoLegivel', () => {
+  it('escolhe texto escuro para cores claras', () => {
+    expect(corTextoLegivel('#fcfcfc')).toBe('#111111')
+  })
+
+  it('escolhe texto branco para cores escuras', () => {
+    expect(corTextoLegivel('#19121f')).toBe('#ffffff')
+  })
+
+  it('escolhe texto branco pro roxo padrão do sistema', () => {
+    expect(corTextoLegivel('#7c3aed')).toBe('#ffffff')
   })
 })

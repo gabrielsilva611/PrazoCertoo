@@ -36,8 +36,13 @@ export function LoginPage() {
   return (
     <div className="flex min-h-svh flex-col bg-brand-bg text-brand-text md:flex-row">
       <div className="flex flex-1 flex-col justify-center gap-8 px-8 py-12 md:px-16">
-        <span className="font-display text-2xl italic text-brand-text">Prazo Certo</span>
-        <p className="-mt-6 text-xs uppercase tracking-wide text-brand-muted">CRM · Vendas a prazo</p>
+        <div className="flex items-center gap-2">
+          <span className="flex h-7 w-7 items-center justify-center rounded-full bg-brand-accent text-sm font-bold text-brand-accent-foreground">
+            ✓
+          </span>
+          <span className="font-display text-lg tracking-wide text-brand-text">PRAZO CERTO</span>
+        </div>
+        <p className="text-xs uppercase tracking-wide text-brand-muted">CRM · Vendas a prazo</p>
 
         <ul className="flex flex-col gap-6">
           {FUNCIONALIDADES.map((item) => (
@@ -51,7 +56,7 @@ export function LoginPage() {
 
       <div className="flex flex-1 items-center justify-center border-t border-brand-border px-8 py-12 md:border-t-0 md:border-l">
         <form onSubmit={aoSubmeter} className="w-full max-w-sm">
-          <h1 className="font-display text-3xl text-brand-text">Bem-vindo de volta</h1>
+          <h1 className="text-2xl font-bold tracking-tight text-brand-text">Bem-vindo de volta</h1>
           <p className="mt-1 text-sm text-brand-muted">Entre na sua conta para continuar</p>
 
           <div className="mt-6 flex flex-col gap-4">
@@ -78,12 +83,12 @@ export function LoginPage() {
             </FormField>
           </div>
 
-          {erro && <p className="mt-4 text-sm text-red-600">{erro}</p>}
+          {erro && <p className="mt-4 text-sm text-red-400">{erro}</p>}
 
           <button
             type="submit"
             disabled={carregando}
-            className="mt-6 w-full rounded-lg bg-brand-accent py-2 font-medium text-white transition hover:bg-brand-accent-hover disabled:opacity-60"
+            className="mt-6 w-full rounded-lg bg-brand-accent py-2 font-medium text-brand-accent-foreground transition hover:bg-brand-accent-hover disabled:opacity-60"
           >
             {carregando ? 'Entrando...' : 'Entrar no sistema'}
           </button>
