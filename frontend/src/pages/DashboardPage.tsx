@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useState } from 'react'
 import { AppLayout } from '../components/AppLayout'
+import { EstatisticasFaixa } from '../components/EstatisticasFaixa'
 import { ScoreBadge } from '../components/ScoreBadge'
 import { StatusParcelaBadge } from '../components/StatusParcelaBadge'
 import { useAuth } from '../AuthContext'
@@ -83,19 +84,33 @@ export function DashboardPage() {
 
   return (
     <AppLayout>
-      <h1 className="text-xl font-semibold">Dashboard</h1>
+      <h1 className="font-display text-3xl text-brand-text">Dashboard</h1>
       <p className="text-sm text-brand-muted">Bem-vindo, {usuario?.nome}</p>
 
       {carregando && <p className="mt-8 text-sm text-brand-muted">Carregando...</p>}
-      {erro && <p className="mt-4 text-sm text-red-400">{erro}</p>}
+      {erro && <p className="mt-4 text-sm text-red-600">{erro}</p>}
 
       {!carregando && indicadores && (
-        <div className="mt-6 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
-          <Kpi rotulo="Total a Receber" valor={indicadores.totalAReceber.valor} />
-          <Kpi rotulo="Vencimentos Hoje" valor={indicadores.vencimentosHoje.valor} destaque="amber" />
-          <Kpi rotulo="Em Atraso" valor={indicadores.emAtraso.valor} destaque="red" />
-          <Kpi rotulo="Recebido no Mês" valor={indicadores.recebidoNoMes} destaque="verde" />
-        </div>
+        <EstatisticasFaixa
+          itens={[
+            { rotulo: 'Total a Receber', valor: formatoMoeda.format(indicadores.totalAReceber.valor) },
+            {
+              rotulo: 'Vencimentos Hoje',
+              valor: formatoMoeda.format(indicadores.vencimentosHoje.valor),
+              destaque: 'amber',
+            },
+            {
+              rotulo: 'Em Atraso',
+              valor: formatoMoeda.format(indicadores.emAtraso.valor),
+              destaque: 'red',
+            },
+            {
+              rotulo: 'Recebido no Mês',
+              valor: formatoMoeda.format(indicadores.recebidoNoMes),
+              destaque: 'accent',
+            },
+          ]}
+        />
       )}
 
       {!carregando && pendencias.length > 0 && (
@@ -103,7 +118,7 @@ export function DashboardPage() {
           <p className="text-xs uppercase tracking-wide text-brand-muted">Clientes com pendências</p>
           <div className="mt-2 overflow-x-auto rounded-lg border border-brand-border">
             <table className="w-full text-left text-sm">
-              <thead className="bg-brand-surface/60 text-xs uppercase tracking-wide text-brand-muted">
+              <thead className="bg-brand-bg text-xs uppercase tracking-wide text-brand-muted">
                 <tr>
                   <th className="px-4 py-3 font-medium">Cliente</th>
                   <th className="px-4 py-3 font-medium">Parcela</th>
@@ -147,29 +162,5 @@ export function DashboardPage() {
         </div>
       )}
     </AppLayout>
-  )
-}
-
-const cores = {
-  padrao: 'text-brand-text',
-  amber: 'text-amber-400',
-  red: 'text-red-400',
-  verde: 'text-brand-accent',
-} as const
-
-function Kpi({
-  rotulo,
-  valor,
-  destaque = 'padrao',
-}: {
-  rotulo: string
-  valor: number
-  destaque?: keyof typeof cores
-}) {
-  return (
-    <div className="rounded-lg border border-brand-border bg-brand-surface/40 p-4">
-      <p className="text-xs uppercase tracking-wide text-brand-muted">{rotulo}</p>
-      <p className={`mt-1 text-2xl font-semibold ${cores[destaque]}`}>{formatoMoeda.format(valor)}</p>
-    </div>
   )
 }

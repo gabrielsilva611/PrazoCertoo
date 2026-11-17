@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react'
 import { Link, useNavigate, useParams } from 'react-router-dom'
 import { AppLayout } from '../components/AppLayout'
+import { EstatisticasFaixa } from '../components/EstatisticasFaixa'
 import { ScoreBadge } from '../components/ScoreBadge'
 import { StatusParcelaBadge } from '../components/StatusParcelaBadge'
 import { useAuth } from '../AuthContext'
@@ -51,7 +52,7 @@ export function ClienteDetalhePage() {
   if (!cliente) {
     return (
       <AppLayout>
-        <p className="text-sm text-red-400">{erro ?? 'Cliente não encontrado.'}</p>
+        <p className="text-sm text-red-600">{erro ?? 'Cliente não encontrado.'}</p>
         <Link to="/clientes" className="mt-4 inline-block text-sm text-brand-accent hover:underline">
           ← Voltar para Clientes
         </Link>
@@ -71,8 +72,8 @@ export function ClienteDetalhePage() {
       </Link>
       <div className="mt-2 flex items-center justify-between">
         <div>
-          <h1 className="text-xl font-semibold">
-            {cliente.nome} {!cliente.ativo && <span className="text-sm font-normal text-brand-muted">(inativo)</span>}
+          <h1 className="font-display text-3xl text-brand-text">
+            {cliente.nome} {!cliente.ativo && <span className="text-lg text-brand-muted">(inativo)</span>}
           </h1>
           <p className="text-sm text-brand-muted">
             {cliente.telefone}
@@ -88,7 +89,7 @@ export function ClienteDetalhePage() {
             <button
               onClick={aoDesativar}
               disabled={desativando}
-              className="text-sm text-red-400 hover:underline disabled:opacity-60"
+              className="text-sm text-red-600 hover:underline disabled:opacity-60"
             >
               {desativando ? 'Desativando...' : 'Desativar'}
             </button>
@@ -96,31 +97,39 @@ export function ClienteDetalhePage() {
         </div>
       </div>
 
-      {erro && <p className="mt-4 text-sm text-red-400">{erro}</p>}
+      {erro && <p className="mt-4 text-sm text-red-600">{erro}</p>}
 
       {cliente.observacoes && (
-        <p className="mt-4 rounded-md border border-brand-border bg-brand-surface/40 p-3 text-sm text-brand-muted">
+        <p className="mt-4 rounded-lg border border-brand-border bg-brand-surface/40 p-3 text-sm text-brand-muted">
           {cliente.observacoes}
         </p>
       )}
 
-      <div className="mt-6 grid grid-cols-2 gap-4 sm:grid-cols-3">
-        <div className="rounded-lg border border-brand-border bg-brand-surface/40 p-4">
-          <p className="text-xs uppercase tracking-wide text-brand-muted">Score</p>
-          <div className="mt-1.5">
-            <ScoreBadge score={cliente.score} />
-          </div>
-        </div>
-        <StatCard rotulo="Vendas registradas" valor={String(cliente.vendas.length)} />
-        <StatCard rotulo="Parcelas em atraso" valor={String(totalAtrasadas)} />
-      </div>
+      <EstatisticasFaixa
+        itens={[
+          {
+            rotulo: 'Score',
+            valor: (
+              <span className="font-sans">
+                <ScoreBadge score={cliente.score} />
+              </span>
+            ),
+          },
+          { rotulo: 'Vendas registradas', valor: cliente.vendas.length },
+          {
+            rotulo: 'Parcelas em atraso',
+            valor: totalAtrasadas,
+            destaque: totalAtrasadas > 0 ? 'red' : 'padrao',
+          },
+        ]}
+      />
 
       <div className="mt-8 grid grid-cols-1 gap-6 lg:grid-cols-2">
         <div>
-          <h2 className="text-sm font-medium">Vendas e parcelas</h2>
+          <h2 className="text-sm font-semibold uppercase tracking-wide text-brand-muted">Vendas e parcelas</h2>
           <div className="mt-2 overflow-x-auto rounded-lg border border-brand-border">
             <table className="w-full text-left text-sm">
-              <thead className="bg-brand-surface/60 text-xs uppercase tracking-wide text-brand-muted">
+              <thead className="bg-brand-bg text-xs uppercase tracking-wide text-brand-muted">
                 <tr>
                   <th className="px-4 py-3 font-medium">Venda</th>
                   <th className="px-4 py-3 font-medium">Parcela</th>
@@ -156,10 +165,10 @@ export function ClienteDetalhePage() {
         </div>
 
         <div>
-          <h2 className="text-sm font-medium">Cobranças enviadas</h2>
+          <h2 className="text-sm font-semibold uppercase tracking-wide text-brand-muted">Cobranças enviadas</h2>
           <div className="mt-2 overflow-x-auto rounded-lg border border-brand-border">
             <table className="w-full text-left text-sm">
-              <thead className="bg-brand-surface/60 text-xs uppercase tracking-wide text-brand-muted">
+              <thead className="bg-brand-bg text-xs uppercase tracking-wide text-brand-muted">
                 <tr>
                   <th className="px-4 py-3 font-medium">Quando</th>
                   <th className="px-4 py-3 font-medium">Canal</th>
@@ -189,14 +198,5 @@ export function ClienteDetalhePage() {
         </div>
       </div>
     </AppLayout>
-  )
-}
-
-function StatCard({ rotulo, valor }: { rotulo: string; valor: string }) {
-  return (
-    <div className="rounded-lg border border-brand-border bg-brand-surface/40 p-4">
-      <p className="text-xs uppercase tracking-wide text-brand-muted">{rotulo}</p>
-      <p className="mt-1 text-xl font-semibold">{valor}</p>
-    </div>
   )
 }

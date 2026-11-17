@@ -90,7 +90,7 @@ export function CadastroSimplesPage({
 
   return (
     <AppLayout>
-      <h1 className="text-2xl font-semibold tracking-tight">{titulo}</h1>
+      <h1 className="font-display text-3xl text-brand-text">{titulo}</h1>
       <p className="mt-1 text-sm text-brand-muted">{itens.length} cadastrados</p>
 
       <form

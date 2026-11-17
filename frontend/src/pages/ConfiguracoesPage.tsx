@@ -29,7 +29,7 @@ export function ConfiguracoesPage() {
 
   return (
     <AppLayout>
-      <h1 className="text-xl font-semibold">Configurações</h1>
+      <h1 className="font-display text-3xl text-brand-text">Configurações</h1>
       <p className="text-sm text-brand-muted">Personalize a aparência do sistema pro seu negócio</p>
 
       <form onSubmit={aoSubmeter} className="mt-6 flex max-w-sm flex-col gap-4">
@@ -40,7 +40,7 @@ export function ConfiguracoesPage() {
               type="color"
               value={corDestaque}
               onChange={(e) => setCorDestaque(e.target.value)}
-              className="h-10 w-14 cursor-pointer rounded-md border border-brand-border bg-brand-surface"
+              className="h-10 w-14 cursor-pointer rounded-lg border border-brand-border bg-brand-surface"
             />
             <input
               value={corDestaque}
@@ -56,13 +56,13 @@ export function ConfiguracoesPage() {
           Usada nos botões, destaques e indicadores em todo o sistema.
         </p>
 
-        {erro && <p className="text-sm text-red-400">{erro}</p>}
+        {erro && <p className="text-sm text-red-600">{erro}</p>}
         {sucesso && <p className="text-sm text-brand-accent">Cor atualizada com sucesso.</p>}
 
         <button
           type="submit"
           disabled={salvando}
-          className="rounded-md bg-brand-accent px-4 py-2 font-medium text-brand-bg hover:bg-brand-accent-hover disabled:opacity-60"
+          className="rounded-lg bg-brand-accent px-4 py-2 font-medium text-white hover:bg-brand-accent-hover disabled:opacity-60"
         >
           {salvando ? 'Salvando...' : 'Salvar'}
         </button>

@@ -40,13 +40,13 @@ export function InventariosPage() {
     <AppLayout>
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-xl font-semibold">Inventário Físico</h1>
+          <h1 className="font-display text-3xl text-brand-text">Inventário Físico</h1>
           <p className="text-sm text-brand-muted">{inventarios.length} inventários registrados</p>
         </div>
         {inventarioAberto ? (
           <Link
             to={`/inventario/${inventarioAberto.id}`}
-            className="rounded-md bg-brand-accent px-4 py-2 text-sm font-medium text-brand-bg hover:bg-brand-accent-hover"
+            className="rounded-lg bg-brand-accent px-4 py-2 text-sm font-medium text-white hover:bg-brand-accent-hover"
           >
             Continuar contagem em aberto
           </Link>
@@ -54,18 +54,18 @@ export function InventariosPage() {
           <button
             onClick={aoIniciar}
             disabled={abrindo}
-            className="rounded-md bg-brand-accent px-4 py-2 text-sm font-medium text-brand-bg hover:bg-brand-accent-hover disabled:opacity-60"
+            className="rounded-lg bg-brand-accent px-4 py-2 text-sm font-medium text-white hover:bg-brand-accent-hover disabled:opacity-60"
           >
             {abrindo ? 'Iniciando...' : '+ Iniciar Inventário'}
           </button>
         )}
       </div>
 
-      {erro && <p className="mt-4 text-sm text-red-400">{erro}</p>}
+      {erro && <p className="mt-4 text-sm text-red-600">{erro}</p>}
 
       <div className="mt-6 overflow-x-auto rounded-lg border border-brand-border">
         <table className="w-full text-left text-sm">
-          <thead className="bg-brand-surface/60 text-xs uppercase tracking-wide text-brand-muted">
+          <thead className="bg-brand-bg text-xs uppercase tracking-wide text-brand-muted">
             <tr>
               <th className="px-4 py-3 font-medium">Iniciado em</th>
               <th className="px-4 py-3 font-medium">Concluído em</th>

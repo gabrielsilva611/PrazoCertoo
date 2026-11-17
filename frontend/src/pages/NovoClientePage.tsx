@@ -34,7 +34,7 @@ export function NovoClientePage() {
 
   return (
     <AppLayout>
-      <h1 className="text-xl font-semibold">Novo Cliente</h1>
+      <h1 className="font-display text-3xl text-brand-text">Novo Cliente</h1>
       <p className="text-sm text-brand-muted">Preencha as informações para cadastrar o cliente</p>
 
       <form onSubmit={aoSubmeter} className="mt-6 flex max-w-lg flex-col gap-4">
@@ -51,7 +51,7 @@ export function NovoClientePage() {
           onObservacoesChange={setObservacoes}
         />
 
-        {erro && <p className="text-sm text-red-400">{erro}</p>}
+        {erro && <p className="text-sm text-red-600">{erro}</p>}
 
         <AcoesFormulario
           rotuloSalvar="Cadastrar Cliente"

@@ -1,7 +1,7 @@
 import type { Score } from '../types'
 
 const ESTILOS: Record<Score, { rotulo: string; classe: string }> = {
-  BOM_PAGADOR: { rotulo: 'Bom Pagador', classe: 'bg-emerald-50 text-emerald-700' },
+  BOM_PAGADOR: { rotulo: 'Bom Pagador', classe: 'bg-brand-accent/10 text-brand-accent' },
   IRREGULAR: { rotulo: 'Irregular', classe: 'bg-amber-50 text-amber-700' },
   INADIMPLENTE: { rotulo: 'Inadimplente', classe: 'bg-red-50 text-red-700' },
 }

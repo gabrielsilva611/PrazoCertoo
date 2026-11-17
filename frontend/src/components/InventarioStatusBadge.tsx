@@ -2,7 +2,7 @@ import type { StatusInventario } from '../types'
 
 const ESTILOS: Record<StatusInventario, { rotulo: string; classe: string }> = {
   ABERTO: { rotulo: 'Em contagem', classe: 'bg-amber-50 text-amber-700' },
-  CONCLUIDO: { rotulo: 'Concluído', classe: 'bg-emerald-50 text-emerald-700' },
+  CONCLUIDO: { rotulo: 'Concluído', classe: 'bg-brand-accent/10 text-brand-accent' },
 }
 
 export function InventarioStatusBadge({ status }: { status: StatusInventario }) {

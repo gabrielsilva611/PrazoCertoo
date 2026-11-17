@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { AppLayout } from '../components/AppLayout'
+import { EstatisticasFaixa } from '../components/EstatisticasFaixa'
 import { api, ApiError } from '../lib/api'
 import type { Categoria, Produto } from '../types'
 
@@ -44,34 +45,40 @@ export function ProdutosPage() {
     <AppLayout>
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-xl font-semibold">Produtos</h1>
+          <h1 className="font-display text-3xl text-brand-text">Produtos</h1>
           <p className="text-sm text-brand-muted">{produtos.length} produtos cadastrados</p>
         </div>
         <Link
           to="/produtos/novo"
-          className="rounded-md bg-brand-accent px-4 py-2 text-sm font-medium text-brand-bg hover:bg-brand-accent-hover"
+          className="rounded-lg bg-brand-accent px-4 py-2 text-sm font-medium text-white hover:bg-brand-accent-hover"
         >
           + Novo Produto
         </Link>
       </div>
 
-      <div className="mt-6 grid grid-cols-1 gap-4 sm:grid-cols-3">
-        <StatCard rotulo="Total de produtos" valor={String(produtos.length)} />
-        <StatCard rotulo="Abaixo do estoque mínimo" valor={String(totalAbaixoDoMinimo)} />
-        <StatCard rotulo="Capital imobilizado" valor={formatoMoeda.format(capitalImobilizadoTotal)} />
-      </div>
+      <EstatisticasFaixa
+        itens={[
+          { rotulo: 'Total de produtos', valor: produtos.length },
+          {
+            rotulo: 'Abaixo do estoque mínimo',
+            valor: totalAbaixoDoMinimo,
+            destaque: totalAbaixoDoMinimo > 0 ? 'red' : 'padrao',
+          },
+          { rotulo: 'Capital imobilizado', valor: formatoMoeda.format(capitalImobilizadoTotal) },
+        ]}
+      />
 
       <input
         type="text"
         placeholder="Buscar por nome..."
         value={busca}
         onChange={(e) => setBusca(e.target.value)}
-        className="mt-6 w-full max-w-sm rounded-md border border-brand-border bg-brand-surface px-3 py-2 text-sm outline-none focus:border-brand-accent"
+        className="mt-6 w-full max-w-sm rounded-lg border border-brand-border bg-brand-surface px-3 py-2 text-sm outline-none focus:border-brand-accent"
       />
 
       <div className="mt-4 overflow-x-auto rounded-lg border border-brand-border">
         <table className="w-full text-left text-sm">
-          <thead className="bg-brand-surface/60 text-xs uppercase tracking-wide text-brand-muted">
+          <thead className="bg-brand-bg text-xs uppercase tracking-wide text-brand-muted">
             <tr>
               <th className="px-4 py-3 font-medium">Produto</th>
               <th className="px-4 py-3 font-medium">Categoria</th>
@@ -92,7 +99,7 @@ export function ProdutosPage() {
 
             {!carregando && erro && (
               <tr>
-                <td colSpan={6} className="px-4 py-6 text-center text-red-400">
+                <td colSpan={6} className="px-4 py-6 text-center text-red-600">
                   {erro}
                 </td>
               </tr>
@@ -118,11 +125,11 @@ export function ProdutosPage() {
                   </td>
                   <td className="px-4 py-3 text-brand-muted">{nomeCategoria(produto.categoriaId)}</td>
                   <td className="px-4 py-3">
-                    <span className={abaixoDoMinimo ? 'font-medium text-red-400' : ''}>
+                    <span className={abaixoDoMinimo ? 'font-medium text-red-600' : ''}>
                       {produto.saldoAtual}
                     </span>
                     {abaixoDoMinimo && (
-                      <span className="ml-2 rounded-full bg-red-400/15 px-2 py-0.5 text-xs text-red-400">
+                      <span className="ml-2 rounded-full bg-red-50 px-2 py-0.5 text-xs text-red-600">
                         abaixo do mínimo
                       </span>
                     )}
@@ -146,14 +153,5 @@ export function ProdutosPage() {
         </table>
       </div>
     </AppLayout>
-  )
-}
-
-function StatCard({ rotulo, valor }: { rotulo: string; valor: string }) {
-  return (
-    <div className="rounded-lg border border-brand-border bg-brand-surface/40 p-4">
-      <p className="text-xs uppercase tracking-wide text-brand-muted">{rotulo}</p>
-      <p className="mt-1 text-2xl font-semibold">{valor}</p>
-    </div>
   )
 }
