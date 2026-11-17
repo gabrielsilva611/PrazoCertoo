@@ -34,11 +34,6 @@ function desativar(negocioId, id) {
   return prisma.produto.updateMany({ where: { id, negocioId }, data: { ativo: false } });
 }
 
-// Usado dentro de transações (RF10) — recebe o client transacional.
-function atualizarSaldo(tx, id, saldoAtual) {
-  return tx.produto.update({ where: { id }, data: { saldoAtual } });
-}
-
 module.exports = {
   listarPorNegocio,
   buscarPorId,
@@ -46,5 +41,4 @@ module.exports = {
   criar,
   atualizar,
   desativar,
-  atualizarSaldo,
 };
