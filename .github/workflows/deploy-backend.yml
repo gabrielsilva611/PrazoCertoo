@@ -21,7 +21,8 @@ jobs:
         with:
           node-version: 24
 
-      - run: npm install
+      - run: npm install -g npm@11.6.2
+      - run: npm ci
 
       - name: Instala Azure Functions Core Tools
         run: npm install -g azure-functions-core-tools@4 --unsafe-perm true
