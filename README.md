@@ -8,7 +8,7 @@ Projeto de Portfólio — Engenharia de Software, Católica SC.
 
 - **Backend:** Node.js + Express, Prisma ORM, PostgreSQL
 - **Frontend:** React + TypeScript + Vite, Tailwind CSS
-- **Infraestrutura:** Docker Compose, Nginx, GitHub Actions
+- **Infraestrutura:** Azure Functions (Flex Consumption) + Azure Static Web Apps, GitHub Actions (CI/CD), Docker Compose (observabilidade local)
 - **Qualidade:** Jest/Supertest (backend), Vitest (frontend), SonarCloud
 - **Observabilidade:** Prometheus + Grafana
 
