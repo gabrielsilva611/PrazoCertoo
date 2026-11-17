@@ -45,6 +45,19 @@ function desativar(negocioId, id) {
   return prisma.cliente.updateMany({ where: { id, negocioId }, data: { ativo: false } });
 }
 
+// Exclusão de verdade (RN de quitação): só chega aqui depois do service
+// confirmar que não há parcela em aberto. Precisa apagar na ordem inversa das
+// FKs — histórico de cobrança e parcelas primeiro, depois as vendas, só então
+// o cliente — senão o Postgres recusa por violar a constraint.
+function excluir(negocioId, id) {
+  return prisma.$transaction(async (tx) => {
+    await tx.historicoCobranca.deleteMany({ where: { clienteId: id } });
+    await tx.parcela.deleteMany({ where: { venda: { clienteId: id } } });
+    await tx.venda.deleteMany({ where: { clienteId: id } });
+    await tx.cliente.deleteMany({ where: { id, negocioId } });
+  });
+}
+
 module.exports = {
   listarPorNegocio,
   buscarPorId,
@@ -52,4 +65,5 @@ module.exports = {
   criar,
   atualizar,
   desativar,
+  excluir,
 };

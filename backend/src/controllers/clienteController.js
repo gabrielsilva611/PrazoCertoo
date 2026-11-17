@@ -42,4 +42,9 @@ async function desativar(req, res) {
   res.status(204).send();
 }
 
-module.exports = { listar, detalhar, criar, atualizar, desativar };
+async function excluir(req, res) {
+  await clienteService.excluir(req.usuario.negocioId, req.params.id);
+  res.status(204).send();
+}
+
+module.exports = { listar, detalhar, criar, atualizar, desativar, excluir };

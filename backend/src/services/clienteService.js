@@ -64,6 +64,23 @@ async function desativar(negocioId, id) {
   await clienteRepository.desativar(negocioId, id);
 }
 
+// Exclusão de verdade, só permitida quando a dívida foi totalmente quitada —
+// senão apagaria o registro da cobrança em aberto, que é o motivo do sistema
+// existir. "Quitada" = toda parcela de toda venda do cliente já tem pagoEm.
+async function excluir(negocioId, id) {
+  const cliente = await clienteRepository.buscarComHistorico(negocioId, id);
+  if (!cliente) {
+    throw new AppError('Cliente não encontrado.', 404);
+  }
+
+  const temParcelaEmAberto = cliente.vendas.some((venda) => venda.parcelas.some((p) => !p.pagoEm));
+  if (temParcelaEmAberto) {
+    throw new AppError('Não é possível excluir: há parcelas em aberto para este cliente.', 400);
+  }
+
+  await clienteRepository.excluir(negocioId, id);
+}
+
 async function buscarOuFalhar(negocioId, id) {
   const cliente = await clienteRepository.buscarPorId(negocioId, id);
   if (!cliente) {
@@ -72,4 +89,4 @@ async function buscarOuFalhar(negocioId, id) {
   return cliente;
 }
 
-module.exports = { listar, buscarDetalhe, criar, atualizar, desativar };
+module.exports = { listar, buscarDetalhe, criar, atualizar, desativar, excluir };
