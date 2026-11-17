@@ -22,10 +22,8 @@ async function obterIndicadores(negocioId) {
   const [parcelasAbertas, recebidoNoMes, clientes] = await Promise.all([
     dashboardRepository.listarParcelasEmAberto(negocioId),
     dashboardRepository.somaRecebidaNoMes(negocioId, inicioDoMes(agora)),
-    // TODO(qualidade): N+1 já documentado — clienteService.listar calcula o
-    // score de cada cliente com uma consulta própria. Aceitável por ora
-    // (poucos clientes em dev), mas o dashboard é chamado com frequência e
-    // deve ser uma das primeiras coisas a otimizar na Sprint de Qualidade.
+    // clienteService.listar já busca as parcelas de todos os clientes numa
+    // única query (corrigido na issue #31) — não é mais N+1.
     clienteService.listar(negocioId),
   ]);
 
