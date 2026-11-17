@@ -17,6 +17,7 @@ import { NovoClientePage } from './pages/NovoClientePage'
 import { NovoProdutoPage } from './pages/NovoProdutoPage'
 import { ProdutoDetalhePage } from './pages/ProdutoDetalhePage'
 import { ProdutosPage } from './pages/ProdutosPage'
+import { RelatoriosPage } from './pages/RelatoriosPage'
 import { VendasPage } from './pages/VendasPage'
 
 function protegida(elemento: ReactElement) {
@@ -43,6 +44,7 @@ export function App() {
       <Route path="/inventario" element={protegida(<InventariosPage />)} />
       <Route path="/inventario/:id" element={protegida(<InventarioDetalhePage />)} />
       <Route path="/configuracoes" element={protegida(<ConfiguracoesPage />)} />
+      <Route path="/relatorios" element={protegida(<RelatoriosPage />)} />
     </Routes>
   )
 }

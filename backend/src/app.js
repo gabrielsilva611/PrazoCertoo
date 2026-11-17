@@ -9,6 +9,7 @@ const fornecedorRoutes = require('./routes/fornecedorRoutes');
 const produtoRoutes = require('./routes/produtoRoutes');
 const inventarioRoutes = require('./routes/inventarioRoutes');
 const configuracaoRoutes = require('./routes/configuracaoRoutes');
+const relatorioRoutes = require('./routes/relatorioRoutes');
 const { tratarErros } = require('./middlewares/errorHandler');
 const { register, medirRequisicoes } = require('./lib/metrics');
 
@@ -39,6 +40,7 @@ app.use('/fornecedores', fornecedorRoutes);
 app.use('/produtos', produtoRoutes);
 app.use('/inventarios', inventarioRoutes);
 app.use('/configuracoes', configuracaoRoutes);
+app.use('/relatorios', relatorioRoutes);
 
 app.use(tratarErros);
 

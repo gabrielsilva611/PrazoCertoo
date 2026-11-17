@@ -8,6 +8,7 @@ import {
   Tags,
   Truck,
   ClipboardList,
+  BarChart3,
   Settings,
   LogOut,
   CheckCircle2,
@@ -23,6 +24,8 @@ const ITENS_MENU = [
   { rotulo: 'Fornecedores', para: '/fornecedores', icone: Truck },
   // RF28, RN13: inventário físico é exclusivo do Dono, assim como no backend.
   { rotulo: 'Inventário', para: '/inventario', icone: ClipboardList, somenteDono: true },
+  // Relatórios são visão gerencial, exclusiva do Dono, como no backend.
+  { rotulo: 'Relatórios', para: '/relatorios', icone: BarChart3, somenteDono: true },
   // Configurações do negócio (ex: cor de destaque) são exclusivas do Dono, como no backend.
   { rotulo: 'Configurações', para: '/configuracoes', icone: Settings, somenteDono: true },
 ]
