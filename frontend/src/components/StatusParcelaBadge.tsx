@@ -1,9 +1,9 @@
 import type { StatusParcela } from '../types'
 
 const ESTILOS: Record<StatusParcela, { rotulo: string; classe: string }> = {
-  ATRASADO: { rotulo: 'Atrasado', classe: 'bg-red-500/15 text-red-400' },
-  PENDENTE: { rotulo: 'Pendente', classe: 'bg-amber-500/15 text-amber-400' },
-  PAGO: { rotulo: 'Pago', classe: 'bg-brand-accent/15 text-brand-accent' },
+  ATRASADO: { rotulo: 'Atrasado', classe: 'bg-red-50 text-red-700' },
+  PENDENTE: { rotulo: 'Pendente', classe: 'bg-amber-50 text-amber-700' },
+  PAGO: { rotulo: 'Pago', classe: 'bg-emerald-50 text-emerald-700' },
 }
 
 export function StatusParcelaBadge({ status }: { status: StatusParcela }) {

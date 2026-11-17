@@ -19,4 +19,4 @@ export function FormField({ rotulo, id, obrigatorio, children }: FormFieldProps)
 }
 
 export const estiloInput =
-  'mt-1 w-full rounded-md border border-brand-border bg-brand-surface px-3 py-2 text-sm text-brand-text outline-none focus:border-brand-accent'
+  'mt-1 w-full rounded-lg border border-brand-border bg-brand-surface px-3 py-2 text-sm text-brand-text outline-none transition focus:border-brand-accent focus:ring-2 focus:ring-brand-accent/20'
