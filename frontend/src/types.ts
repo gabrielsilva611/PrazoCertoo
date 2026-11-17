@@ -160,3 +160,30 @@ export interface InventarioItem {
 export interface InventarioDetalhe extends InventarioResumo {
   itens: InventarioItem[]
 }
+
+export interface RelatorioVendas {
+  vendas: Venda[]
+  totalVendido: number
+  totalAcordos: number
+}
+
+export interface InadimplenciaCliente {
+  clienteId: string
+  nome: string
+  totalPendente: number
+  totalAtrasado: number
+  parcelasPendentes: number
+  parcelasAtrasadas: number
+}
+
+export interface RelatorioInadimplencia {
+  clientes: InadimplenciaCliente[]
+  totalEmAberto: number
+  totalAtrasado: number
+}
+
+export interface RelatorioEstoque {
+  produtos: Produto[]
+  totalCapitalImobilizado: number
+  totalAbaixoDoMinimo: number
+}
