@@ -3,7 +3,7 @@ import type { StatusParcela } from '../types'
 const ESTILOS: Record<StatusParcela, { rotulo: string; classe: string }> = {
   ATRASADO: { rotulo: 'Atrasado', classe: 'bg-red-50 text-red-700' },
   PENDENTE: { rotulo: 'Pendente', classe: 'bg-amber-50 text-amber-700' },
-  PAGO: { rotulo: 'Pago', classe: 'bg-emerald-50 text-emerald-700' },
+  PAGO: { rotulo: 'Pago', classe: 'bg-brand-accent/10 text-brand-accent' },
 }
 
 export function StatusParcelaBadge({ status }: { status: StatusParcela }) {

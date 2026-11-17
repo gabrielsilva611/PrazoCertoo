@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { AppLayout } from '../components/AppLayout'
+import { EstatisticasFaixa } from '../components/EstatisticasFaixa'
 import { ScoreBadge } from '../components/ScoreBadge'
 import { api, ApiError } from '../lib/api'
 import type { Cliente } from '../types'
@@ -34,34 +35,36 @@ export function ClientesPage() {
     <AppLayout>
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-xl font-semibold">Clientes</h1>
+          <h1 className="font-display text-3xl text-brand-text">Clientes</h1>
           <p className="text-sm text-brand-muted">{clientes.length} clientes cadastrados</p>
         </div>
         <Link
           to="/clientes/novo"
-          className="rounded-md bg-brand-accent px-4 py-2 text-sm font-medium text-brand-bg hover:bg-brand-accent-hover"
+          className="rounded-lg bg-brand-accent px-4 py-2 text-sm font-medium text-white hover:bg-brand-accent-hover"
         >
           + Novo Cliente
         </Link>
       </div>
 
-      <div className="mt-6 grid grid-cols-1 gap-4 sm:grid-cols-3">
-        <StatCard rotulo="Total de clientes" valor={clientes.length} />
-        <StatCard rotulo="Bons pagadores" valor={totalBonsPagadores} />
-        <StatCard rotulo="Inadimplentes" valor={totalInadimplentes} />
-      </div>
+      <EstatisticasFaixa
+        itens={[
+          { rotulo: 'Total de clientes', valor: clientes.length },
+          { rotulo: 'Bons pagadores', valor: totalBonsPagadores, destaque: 'accent' },
+          { rotulo: 'Inadimplentes', valor: totalInadimplentes, destaque: totalInadimplentes > 0 ? 'red' : 'padrao' },
+        ]}
+      />
 
       <input
         type="text"
         placeholder="Buscar por nome ou telefone..."
         value={busca}
         onChange={(e) => setBusca(e.target.value)}
-        className="mt-6 w-full max-w-sm rounded-md border border-brand-border bg-brand-surface px-3 py-2 text-sm outline-none focus:border-brand-accent"
+        className="mt-6 w-full max-w-sm rounded-lg border border-brand-border bg-brand-surface px-3 py-2 text-sm outline-none focus:border-brand-accent"
       />
 
       <div className="mt-4 overflow-x-auto rounded-lg border border-brand-border">
         <table className="w-full text-left text-sm">
-          <thead className="bg-brand-surface/60 text-xs uppercase tracking-wide text-brand-muted">
+          <thead className="bg-brand-bg text-xs uppercase tracking-wide text-brand-muted">
             <tr>
               <th className="px-4 py-3 font-medium">Cliente</th>
               <th className="px-4 py-3 font-medium">Telefone</th>
@@ -80,7 +83,7 @@ export function ClientesPage() {
 
             {!carregando && erro && (
               <tr>
-                <td colSpan={4} className="px-4 py-6 text-center text-red-400">
+                <td colSpan={4} className="px-4 py-6 text-center text-red-600">
                   {erro}
                 </td>
               </tr>
@@ -116,14 +119,5 @@ export function ClientesPage() {
         </table>
       </div>
     </AppLayout>
-  )
-}
-
-function StatCard({ rotulo, valor }: { rotulo: string; valor: number }) {
-  return (
-    <div className="rounded-lg border border-brand-border bg-brand-surface/40 p-4">
-      <p className="text-xs uppercase tracking-wide text-brand-muted">{rotulo}</p>
-      <p className="mt-1 text-2xl font-semibold">{valor}</p>
-    </div>
   )
 }

@@ -80,7 +80,7 @@ export function NovaVendaPage() {
 
   return (
     <AppLayout>
-      <h1 className="text-xl font-semibold">Nova Venda a Prazo</h1>
+      <h1 className="font-display text-3xl text-brand-text">Nova Venda a Prazo</h1>
       <p className="text-sm text-brand-muted">Preenche os dados do acordo comercial</p>
 
       <div className="mt-6 grid grid-cols-1 gap-6 lg:grid-cols-[1fr_320px]">
@@ -89,7 +89,7 @@ export function NovaVendaPage() {
             Cliente
           </label>
           {clienteSelecionado ? (
-            <div className="mt-1 flex items-center justify-between rounded-md border border-brand-border bg-brand-surface px-3 py-2">
+            <div className="mt-1 flex items-center justify-between rounded-lg border border-brand-border bg-brand-surface px-3 py-2">
               <div>
                 <p className="text-sm font-medium">{clienteSelecionado.nome}</p>
                 <ScoreBadge score={clienteSelecionado.score} />
@@ -112,7 +112,7 @@ export function NovaVendaPage() {
                 className={estiloInput}
               />
               {clientesFiltrados.length > 0 && (
-                <ul className="mt-1 max-h-40 overflow-y-auto rounded-md border border-brand-border bg-brand-surface">
+                <ul className="mt-1 max-h-40 overflow-y-auto rounded-lg border border-brand-border bg-brand-surface">
                   {clientesFiltrados.map((cliente) => (
                     <li key={cliente.id}>
                       <button
@@ -191,20 +191,20 @@ export function NovaVendaPage() {
             </FormField>
           </div>
 
-          {erro && <p className="mt-4 text-sm text-red-400">{erro}</p>}
+          {erro && <p className="mt-4 text-sm text-red-600">{erro}</p>}
 
           <div className="mt-6 flex gap-3">
             <button
               type="submit"
               disabled={salvando}
-              className="rounded-md bg-brand-accent px-4 py-2 font-medium text-brand-bg hover:bg-brand-accent-hover disabled:opacity-60"
+              className="rounded-lg bg-brand-accent px-4 py-2 font-medium text-white hover:bg-brand-accent-hover disabled:opacity-60"
             >
               {salvando ? 'Salvando...' : 'Registrar Venda'}
             </button>
             <button
               type="button"
               onClick={() => navegar('/vendas')}
-              className="rounded-md border border-brand-border px-4 py-2 hover:border-brand-accent"
+              className="rounded-lg border border-brand-border px-4 py-2 hover:border-brand-accent"
             >
               Cancelar
             </button>

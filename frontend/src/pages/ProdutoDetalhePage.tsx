@@ -1,6 +1,7 @@
 import { useEffect, useState, type FormEvent } from 'react'
 import { Link, useParams } from 'react-router-dom'
 import { AppLayout } from '../components/AppLayout'
+import { EstatisticasFaixa } from '../components/EstatisticasFaixa'
 import { FormField, estiloInput } from '../components/FormField'
 import { MovimentacaoBadge } from '../components/MovimentacaoBadge'
 import { api, ApiError } from '../lib/api'
@@ -68,7 +69,7 @@ export function ProdutoDetalhePage() {
   if (!produto) {
     return (
       <AppLayout>
-        <p className="text-sm text-red-400">{erro ?? 'Produto não encontrado.'}</p>
+        <p className="text-sm text-red-600">{erro ?? 'Produto não encontrado.'}</p>
         <Link to="/produtos" className="mt-4 inline-block text-sm text-brand-accent hover:underline">
           ← Voltar para Produtos
         </Link>
@@ -83,25 +84,31 @@ export function ProdutoDetalhePage() {
       </Link>
       <div className="mt-2 flex items-center justify-between">
         <div>
-          <h1 className="text-xl font-semibold">
-            {produto.nome} <span className="text-sm font-normal text-brand-muted">{produto.unidade}</span>
+          <h1 className="font-display text-3xl text-brand-text">
+            {produto.nome} <span className="text-lg text-brand-muted">{produto.unidade}</span>
           </h1>
         </div>
       </div>
 
-      <div className="mt-6 grid grid-cols-2 gap-4 sm:grid-cols-4">
-        <StatCard rotulo="Saldo atual" valor={String(produto.saldoAtual)} />
-        <StatCard rotulo="Estoque mínimo" valor={String(produto.estoqueMinimo)} />
-        <StatCard rotulo="Preço de venda" valor={formatoMoeda.format(Number(produto.precoVenda))} />
-        <StatCard rotulo="Capital imobilizado" valor={formatoMoeda.format(produto.capitalImobilizado)} />
-      </div>
+      <EstatisticasFaixa
+        itens={[
+          {
+            rotulo: 'Saldo atual',
+            valor: produto.saldoAtual,
+            destaque: produto.saldoAtual < produto.estoqueMinimo ? 'red' : 'padrao',
+          },
+          { rotulo: 'Estoque mínimo', valor: produto.estoqueMinimo },
+          { rotulo: 'Preço de venda', valor: formatoMoeda.format(Number(produto.precoVenda)) },
+          { rotulo: 'Capital imobilizado', valor: formatoMoeda.format(produto.capitalImobilizado) },
+        ]}
+      />
 
       <div className="mt-8 grid grid-cols-1 gap-6 lg:grid-cols-[360px_1fr]">
         <form
           onSubmit={aoRegistrar}
           className="flex h-fit flex-col gap-4 rounded-lg border border-brand-border bg-brand-surface/40 p-4"
         >
-          <h2 className="text-sm font-medium">Registrar movimentação</h2>
+          <h2 className="text-sm font-semibold uppercase tracking-wide text-brand-muted">Registrar movimentação</h2>
 
           <FormField rotulo="Tipo" id="tipo" obrigatorio>
             <select
@@ -139,12 +146,12 @@ export function ProdutoDetalhePage() {
             />
           </FormField>
 
-          {erro && <p className="text-sm text-red-400">{erro}</p>}
+          {erro && <p className="text-sm text-red-600">{erro}</p>}
 
           <button
             type="submit"
             disabled={registrando}
-            className="rounded-md bg-brand-accent px-4 py-2 text-sm font-medium text-brand-bg hover:bg-brand-accent-hover disabled:opacity-60"
+            className="rounded-lg bg-brand-accent px-4 py-2 text-sm font-medium text-white hover:bg-brand-accent-hover disabled:opacity-60"
           >
             {registrando ? 'Registrando...' : 'Registrar'}
           </button>
@@ -152,7 +159,7 @@ export function ProdutoDetalhePage() {
 
         <div className="overflow-x-auto rounded-lg border border-brand-border">
           <table className="w-full text-left text-sm">
-            <thead className="bg-brand-surface/60 text-xs uppercase tracking-wide text-brand-muted">
+            <thead className="bg-brand-bg text-xs uppercase tracking-wide text-brand-muted">
               <tr>
                 <th className="px-4 py-3 font-medium">Quando</th>
                 <th className="px-4 py-3 font-medium">Tipo</th>
@@ -189,14 +196,5 @@ export function ProdutoDetalhePage() {
         </div>
       </div>
     </AppLayout>
-  )
-}
-
-function StatCard({ rotulo, valor }: { rotulo: string; valor: string }) {
-  return (
-    <div className="rounded-lg border border-brand-border bg-brand-surface/40 p-4">
-      <p className="text-xs uppercase tracking-wide text-brand-muted">{rotulo}</p>
-      <p className="mt-1 text-xl font-semibold">{valor}</p>
-    </div>
   )
 }

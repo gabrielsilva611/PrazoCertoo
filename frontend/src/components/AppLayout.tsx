@@ -10,7 +10,6 @@ import {
   ClipboardList,
   Settings,
   LogOut,
-  CheckCircle2,
 } from 'lucide-react'
 import { useAuth } from '../AuthContext'
 
@@ -28,10 +27,10 @@ const ITENS_MENU = [
 ]
 
 function linkClasse({ isActive }: { isActive: boolean }) {
-  const base = 'flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium transition'
+  const base = 'flex items-center gap-3 border-l-2 px-3 py-2 text-sm font-medium transition'
   return isActive
-    ? `${base} bg-brand-accent/10 text-brand-accent`
-    : `${base} text-brand-muted hover:bg-brand-bg hover:text-brand-text`
+    ? `${base} border-brand-accent text-brand-accent`
+    : `${base} border-transparent text-brand-muted hover:border-brand-border hover:text-brand-text`
 }
 
 export function AppLayout({ children }: { children: ReactNode }) {
@@ -40,17 +39,14 @@ export function AppLayout({ children }: { children: ReactNode }) {
   return (
     <div className="flex min-h-svh bg-brand-bg text-brand-text">
       <aside className="flex w-64 flex-shrink-0 flex-col border-r border-brand-border bg-brand-surface p-4">
-        <div className="flex items-center gap-2 px-2 py-2">
-          <span className="flex h-8 w-8 items-center justify-center rounded-lg bg-brand-accent text-brand-surface">
-            <CheckCircle2 className="h-5 w-5" />
-          </span>
-          <span className="text-lg font-semibold tracking-tight">Prazo Certo</span>
+        <div className="px-3 py-2">
+          <span className="font-display text-xl italic text-brand-text">Prazo Certo</span>
         </div>
 
-        <nav className="mt-6 flex flex-col gap-1">
+        <nav className="mt-6 flex flex-col gap-0.5">
           {ITENS_MENU.filter((item) => !item.somenteDono || usuario?.perfil === 'DONO').map((item) => (
             <NavLink key={item.para} to={item.para} end className={linkClasse}>
-              <item.icone className="h-4.5 w-4.5" />
+              <item.icone className="h-4 w-4" />
               {item.rotulo}
             </NavLink>
           ))}

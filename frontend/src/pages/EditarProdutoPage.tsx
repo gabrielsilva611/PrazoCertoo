@@ -67,7 +67,7 @@ export function EditarProdutoPage() {
 
   return (
     <AppLayout>
-      <h1 className="text-xl font-semibold">Editar Produto</h1>
+      <h1 className="font-display text-3xl text-brand-text">Editar Produto</h1>
       <p className="text-sm text-brand-muted">Atualize as informações do produto</p>
 
       <form onSubmit={aoSubmeter} className="mt-6 flex max-w-lg flex-col gap-4">
@@ -87,7 +87,7 @@ export function EditarProdutoPage() {
           onEstoqueMinimoChange={setEstoqueMinimo}
         />
 
-        {(erro ?? erroCarregamento) && <p className="text-sm text-red-400">{erro ?? erroCarregamento}</p>}
+        {(erro ?? erroCarregamento) && <p className="text-sm text-red-600">{erro ?? erroCarregamento}</p>}
 
         <AcoesFormulario
           rotuloSalvar="Salvar alterações"
