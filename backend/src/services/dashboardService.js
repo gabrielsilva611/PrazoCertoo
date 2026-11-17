@@ -5,8 +5,8 @@ const { calcularIndicadores, OFFSET_BRASIL_MS } = require('../lib/dashboardUtil'
 // precisa do instante UTC real do início do mês, não só a string da data.
 
 // Início do mês no horário de Brasília, não em UTC — mesmo motivo do
-// dataLocalISO em dashboardUtil.js (evita cortar o mês 3h antes da hora
-// certa pra quem está no fuso do Brasil).
+// diaLocalDeAgora em backend/src/lib/dataUtil.js (evita cortar o mês 3h antes
+// da hora certa pra quem está no fuso do Brasil).
 function inicioDoMes(data) {
   const localizada = new Date(data.getTime() - OFFSET_BRASIL_MS);
   const inicioEmUtcDoDiaLocal = Date.UTC(localizada.getUTCFullYear(), localizada.getUTCMonth(), 1);
