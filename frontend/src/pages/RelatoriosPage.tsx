@@ -1,9 +1,9 @@
-import { useEffect, useState, type FormEvent } from 'react'
+import { useState, type FormEvent } from 'react'
 import { Download } from 'lucide-react'
 import { AppLayout } from '../components/AppLayout'
 import { EstatisticasFaixa } from '../components/EstatisticasFaixa'
 import { FormField, estiloInput } from '../components/FormField'
-import { api, ApiError } from '../lib/api'
+import { useRelatorio } from '../hooks/useRelatorio'
 import { exportarCsv } from '../lib/csv'
 import type { RelatorioEstoque, RelatorioInadimplencia, RelatorioVendas } from '../types'
 
@@ -44,28 +44,24 @@ function BotaoExportar({ onClick }: { onClick: () => void }) {
   )
 }
 
+function CabecalhoSecao({ titulo, onExportar }: { titulo: string; onExportar?: () => void }) {
+  return (
+    <div className="flex items-center justify-between">
+      <h2 className="text-sm font-semibold uppercase tracking-wide text-brand-muted">{titulo}</h2>
+      {onExportar && <BotaoExportar onClick={onExportar} />}
+    </div>
+  )
+}
+
 function RelatorioVendasSecao() {
   const [inicio, setInicio] = useState(haTrintaDias())
   const [fim, setFim] = useState(hoje())
-  const [dados, setDados] = useState<RelatorioVendas | null>(null)
-  const [carregando, setCarregando] = useState(false)
-  const [erro, setErro] = useState<string | null>(null)
-
-  function buscar(periodoInicio: string, periodoFim: string) {
-    setCarregando(true)
-    setErro(null)
-    api
-      .get<RelatorioVendas>(`/relatorios/vendas?inicio=${periodoInicio}&fim=${periodoFim}`)
-      .then(setDados)
-      .catch((e) => setErro(e instanceof ApiError ? e.message : 'Não foi possível carregar o relatório.'))
-      .finally(() => setCarregando(false))
-  }
-
-  useEffect(() => buscar(inicio, fim), []) // eslint-disable-line react-hooks/exhaustive-deps
+  const [caminho, setCaminho] = useState(`/relatorios/vendas?inicio=${haTrintaDias()}&fim=${hoje()}`)
+  const { dados, carregando, erro } = useRelatorio<RelatorioVendas>(caminho)
 
   function aoSubmeter(evento: FormEvent) {
     evento.preventDefault()
-    buscar(inicio, fim)
+    setCaminho(`/relatorios/vendas?inicio=${inicio}&fim=${fim}`)
   }
 
   function exportar() {
@@ -85,10 +81,10 @@ function RelatorioVendasSecao() {
 
   return (
     <section>
-      <div className="flex items-center justify-between">
-        <h2 className="text-sm font-semibold uppercase tracking-wide text-brand-muted">Vendas por período</h2>
-        {dados && dados.vendas.length > 0 && <BotaoExportar onClick={exportar} />}
-      </div>
+      <CabecalhoSecao
+        titulo="Vendas por período"
+        onExportar={dados && dados.vendas.length > 0 ? exportar : undefined}
+      />
 
       <form onSubmit={aoSubmeter} className="mt-3 flex flex-wrap items-end gap-3">
         <FormField rotulo="Início" id="relInicio">
@@ -167,15 +163,7 @@ function RelatorioVendasSecao() {
 }
 
 function RelatorioInadimplenciaSecao() {
-  const [dados, setDados] = useState<RelatorioInadimplencia | null>(null)
-  const [erro, setErro] = useState<string | null>(null)
-
-  useEffect(() => {
-    api
-      .get<RelatorioInadimplencia>('/relatorios/inadimplencia')
-      .then(setDados)
-      .catch((e) => setErro(e instanceof ApiError ? e.message : 'Não foi possível carregar o relatório.'))
-  }, [])
+  const { dados, erro } = useRelatorio<RelatorioInadimplencia>('/relatorios/inadimplencia')
 
   function exportar() {
     if (!dados) return
@@ -188,10 +176,10 @@ function RelatorioInadimplenciaSecao() {
 
   return (
     <section>
-      <div className="flex items-center justify-between">
-        <h2 className="text-sm font-semibold uppercase tracking-wide text-brand-muted">Inadimplência</h2>
-        {dados && dados.clientes.length > 0 && <BotaoExportar onClick={exportar} />}
-      </div>
+      <CabecalhoSecao
+        titulo="Inadimplência"
+        onExportar={dados && dados.clientes.length > 0 ? exportar : undefined}
+      />
 
       {erro && <p className="mt-3 text-sm text-red-400">{erro}</p>}
 
@@ -246,15 +234,7 @@ function RelatorioInadimplenciaSecao() {
 }
 
 function RelatorioEstoqueSecao() {
-  const [dados, setDados] = useState<RelatorioEstoque | null>(null)
-  const [erro, setErro] = useState<string | null>(null)
-
-  useEffect(() => {
-    api
-      .get<RelatorioEstoque>('/relatorios/estoque')
-      .then(setDados)
-      .catch((e) => setErro(e instanceof ApiError ? e.message : 'Não foi possível carregar o relatório.'))
-  }, [])
+  const { dados, erro } = useRelatorio<RelatorioEstoque>('/relatorios/estoque')
 
   function exportar() {
     if (!dados) return
@@ -267,10 +247,7 @@ function RelatorioEstoqueSecao() {
 
   return (
     <section>
-      <div className="flex items-center justify-between">
-        <h2 className="text-sm font-semibold uppercase tracking-wide text-brand-muted">Estoque</h2>
-        {dados && dados.produtos.length > 0 && <BotaoExportar onClick={exportar} />}
-      </div>
+      <CabecalhoSecao titulo="Estoque" onExportar={dados && dados.produtos.length > 0 ? exportar : undefined} />
 
       {erro && <p className="mt-3 text-sm text-red-400">{erro}</p>}
 
