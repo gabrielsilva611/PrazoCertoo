@@ -35,12 +35,12 @@ export function ClientesPage() {
     <AppLayout>
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="font-display text-3xl text-brand-text">Clientes</h1>
+          <h1 className="text-2xl font-bold tracking-tight text-brand-text">Clientes</h1>
           <p className="text-sm text-brand-muted">{clientes.length} clientes cadastrados</p>
         </div>
         <Link
           to="/clientes/novo"
-          className="rounded-lg bg-brand-accent px-4 py-2 text-sm font-medium text-white hover:bg-brand-accent-hover"
+          className="rounded-lg bg-brand-accent px-4 py-2 text-sm font-medium text-brand-accent-foreground hover:bg-brand-accent-hover"
         >
           + Novo Cliente
         </Link>
@@ -83,7 +83,7 @@ export function ClientesPage() {
 
             {!carregando && erro && (
               <tr>
-                <td colSpan={4} className="px-4 py-6 text-center text-red-600">
+                <td colSpan={4} className="px-4 py-6 text-center text-red-400">
                   {erro}
                 </td>
               </tr>

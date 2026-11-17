@@ -46,7 +46,7 @@ export function NovoProdutoPage() {
 
   return (
     <AppLayout>
-      <h1 className="font-display text-3xl text-brand-text">Novo Produto</h1>
+      <h1 className="text-2xl font-bold tracking-tight text-brand-text">Novo Produto</h1>
       <p className="text-sm text-brand-muted">Preencha as informações para cadastrar o produto</p>
 
       <form onSubmit={aoSubmeter} className="mt-6 flex max-w-lg flex-col gap-4">
@@ -66,7 +66,7 @@ export function NovoProdutoPage() {
           onEstoqueMinimoChange={setEstoqueMinimo}
         />
 
-        {erro && <p className="text-sm text-red-600">{erro}</p>}
+        {erro && <p className="text-sm text-red-400">{erro}</p>}
 
         <AcoesFormulario
           rotuloSalvar="Cadastrar Produto"

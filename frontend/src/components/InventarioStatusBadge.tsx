@@ -1,7 +1,7 @@
 import type { StatusInventario } from '../types'
 
 const ESTILOS: Record<StatusInventario, { rotulo: string; classe: string }> = {
-  ABERTO: { rotulo: 'Em contagem', classe: 'bg-amber-50 text-amber-700' },
+  ABERTO: { rotulo: 'Em contagem', classe: 'bg-amber-500/15 text-amber-400' },
   CONCLUIDO: { rotulo: 'Concluído', classe: 'bg-brand-accent/10 text-brand-accent' },
 }
 

@@ -11,7 +11,7 @@ export function AcoesFormulario({ rotuloSalvar, rotuloSalvando, salvando, onCanc
       <button
         type="submit"
         disabled={salvando}
-        className="rounded-lg bg-brand-accent px-4 py-2 font-medium text-white transition hover:bg-brand-accent-hover disabled:opacity-60"
+        className="rounded-lg bg-brand-accent px-4 py-2 font-medium text-brand-accent-foreground transition hover:bg-brand-accent-hover disabled:opacity-60"
       >
         {salvando ? rotuloSalvando : rotuloSalvar}
       </button>

@@ -2,8 +2,8 @@ import type { Score } from '../types'
 
 const ESTILOS: Record<Score, { rotulo: string; classe: string }> = {
   BOM_PAGADOR: { rotulo: 'Bom Pagador', classe: 'bg-brand-accent/10 text-brand-accent' },
-  IRREGULAR: { rotulo: 'Irregular', classe: 'bg-amber-50 text-amber-700' },
-  INADIMPLENTE: { rotulo: 'Inadimplente', classe: 'bg-red-50 text-red-700' },
+  IRREGULAR: { rotulo: 'Irregular', classe: 'bg-amber-500/15 text-amber-400' },
+  INADIMPLENTE: { rotulo: 'Inadimplente', classe: 'bg-red-500/15 text-red-400' },
 }
 
 export function ScoreBadge({ score }: { score: Score }) {

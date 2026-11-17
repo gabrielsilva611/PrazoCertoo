@@ -2,9 +2,9 @@ import type { TipoMovimentacao } from '../types'
 
 const ESTILOS: Record<TipoMovimentacao, { rotulo: string; classe: string }> = {
   ENTRADA: { rotulo: 'Entrada', classe: 'bg-brand-accent/10 text-brand-accent' },
-  SAIDA: { rotulo: 'Saída', classe: 'bg-red-50 text-red-700' },
-  AJUSTE: { rotulo: 'Ajuste', classe: 'bg-amber-50 text-amber-700' },
-  INVENTARIO: { rotulo: 'Inventário', classe: 'bg-blue-50 text-blue-700' },
+  SAIDA: { rotulo: 'Saída', classe: 'bg-red-500/15 text-red-400' },
+  AJUSTE: { rotulo: 'Ajuste', classe: 'bg-amber-500/15 text-amber-400' },
+  INVENTARIO: { rotulo: 'Inventário', classe: 'bg-blue-500/15 text-blue-400' },
 }
 
 export function MovimentacaoBadge({ tipo }: { tipo: TipoMovimentacao }) {

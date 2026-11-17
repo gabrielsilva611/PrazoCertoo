@@ -24,12 +24,12 @@ export function VendasPage() {
     <AppLayout>
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="font-display text-3xl text-brand-text">Vendas a Prazo</h1>
+          <h1 className="text-2xl font-bold tracking-tight text-brand-text">Vendas a Prazo</h1>
           <p className="text-sm text-brand-muted">{vendas.length} acordos registrados</p>
         </div>
         <Link
           to="/vendas/novo"
-          className="rounded-lg bg-brand-accent px-4 py-2 text-sm font-medium text-white hover:bg-brand-accent-hover"
+          className="rounded-lg bg-brand-accent px-4 py-2 text-sm font-medium text-brand-accent-foreground hover:bg-brand-accent-hover"
         >
           + Nova Venda
         </Link>
@@ -56,7 +56,7 @@ export function VendasPage() {
             )}
             {!carregando && erro && (
               <tr>
-                <td colSpan={5} className="px-4 py-6 text-center text-red-600">
+                <td colSpan={5} className="px-4 py-6 text-center text-red-400">
                   {erro}
                 </td>
               </tr>
@@ -80,7 +80,7 @@ export function VendasPage() {
                   </td>
                   <td className="px-4 py-3">
                     {atrasadas > 0 ? (
-                      <span className="text-red-600">{atrasadas}</span>
+                      <span className="text-red-400">{atrasadas}</span>
                     ) : (
                       <span className="text-brand-muted">—</span>
                     )}

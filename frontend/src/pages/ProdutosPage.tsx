@@ -45,12 +45,12 @@ export function ProdutosPage() {
     <AppLayout>
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="font-display text-3xl text-brand-text">Produtos</h1>
+          <h1 className="text-2xl font-bold tracking-tight text-brand-text">Produtos</h1>
           <p className="text-sm text-brand-muted">{produtos.length} produtos cadastrados</p>
         </div>
         <Link
           to="/produtos/novo"
-          className="rounded-lg bg-brand-accent px-4 py-2 text-sm font-medium text-white hover:bg-brand-accent-hover"
+          className="rounded-lg bg-brand-accent px-4 py-2 text-sm font-medium text-brand-accent-foreground hover:bg-brand-accent-hover"
         >
           + Novo Produto
         </Link>
@@ -99,7 +99,7 @@ export function ProdutosPage() {
 
             {!carregando && erro && (
               <tr>
-                <td colSpan={6} className="px-4 py-6 text-center text-red-600">
+                <td colSpan={6} className="px-4 py-6 text-center text-red-400">
                   {erro}
                 </td>
               </tr>
@@ -125,11 +125,11 @@ export function ProdutosPage() {
                   </td>
                   <td className="px-4 py-3 text-brand-muted">{nomeCategoria(produto.categoriaId)}</td>
                   <td className="px-4 py-3">
-                    <span className={abaixoDoMinimo ? 'font-medium text-red-600' : ''}>
+                    <span className={abaixoDoMinimo ? 'font-medium text-red-400' : ''}>
                       {produto.saldoAtual}
                     </span>
                     {abaixoDoMinimo && (
-                      <span className="ml-2 rounded-full bg-red-50 px-2 py-0.5 text-xs text-red-600">
+                      <span className="ml-2 rounded-full bg-red-500/15 px-2 py-0.5 text-xs text-red-400">
                         abaixo do mínimo
                       </span>
                     )}

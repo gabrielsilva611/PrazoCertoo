@@ -1,6 +1,6 @@
 import { createContext, useContext, useEffect, useState, type ReactNode } from 'react'
 import { api } from './lib/api'
-import { escurecer } from './lib/cor'
+import { corTextoLegivel, escurecer } from './lib/cor'
 import type { LoginResponse, Usuario } from './types'
 
 interface AuthContextValue {
@@ -21,6 +21,7 @@ function aplicarCorDestaque(corDestaque: string) {
   const raiz = document.documentElement.style
   raiz.setProperty('--color-brand-accent', corDestaque)
   raiz.setProperty('--color-brand-accent-hover', escurecer(corDestaque, 0.18))
+  raiz.setProperty('--color-brand-accent-foreground', corTextoLegivel(corDestaque))
 }
 
 export function AuthProvider({ children }: { children: ReactNode }) {

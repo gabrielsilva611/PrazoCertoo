@@ -10,6 +10,7 @@ import {
   ClipboardList,
   Settings,
   LogOut,
+  CheckCircle2,
 } from 'lucide-react'
 import { useAuth } from '../AuthContext'
 
@@ -39,8 +40,11 @@ export function AppLayout({ children }: { children: ReactNode }) {
   return (
     <div className="flex min-h-svh bg-brand-bg text-brand-text">
       <aside className="flex w-64 flex-shrink-0 flex-col border-r border-brand-border bg-brand-surface p-4">
-        <div className="px-3 py-2">
-          <span className="font-display text-xl italic text-brand-text">Prazo Certo</span>
+        <div className="flex items-center gap-2 px-2 py-2">
+          <span className="flex h-8 w-8 items-center justify-center rounded-lg bg-brand-accent text-brand-accent-foreground">
+            <CheckCircle2 className="h-5 w-5" />
+          </span>
+          <span className="font-display text-lg tracking-wide text-brand-text">PRAZO CERTO</span>
         </div>
 
         <nav className="mt-6 flex flex-col gap-0.5">

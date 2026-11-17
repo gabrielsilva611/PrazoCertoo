@@ -69,7 +69,7 @@ export function ProdutoDetalhePage() {
   if (!produto) {
     return (
       <AppLayout>
-        <p className="text-sm text-red-600">{erro ?? 'Produto não encontrado.'}</p>
+        <p className="text-sm text-red-400">{erro ?? 'Produto não encontrado.'}</p>
         <Link to="/produtos" className="mt-4 inline-block text-sm text-brand-accent hover:underline">
           ← Voltar para Produtos
         </Link>
@@ -84,7 +84,7 @@ export function ProdutoDetalhePage() {
       </Link>
       <div className="mt-2 flex items-center justify-between">
         <div>
-          <h1 className="font-display text-3xl text-brand-text">
+          <h1 className="text-2xl font-bold tracking-tight text-brand-text">
             {produto.nome} <span className="text-lg text-brand-muted">{produto.unidade}</span>
           </h1>
         </div>
@@ -146,12 +146,12 @@ export function ProdutoDetalhePage() {
             />
           </FormField>
 
-          {erro && <p className="text-sm text-red-600">{erro}</p>}
+          {erro && <p className="text-sm text-red-400">{erro}</p>}
 
           <button
             type="submit"
             disabled={registrando}
-            className="rounded-lg bg-brand-accent px-4 py-2 text-sm font-medium text-white hover:bg-brand-accent-hover disabled:opacity-60"
+            className="rounded-lg bg-brand-accent px-4 py-2 text-sm font-medium text-brand-accent-foreground hover:bg-brand-accent-hover disabled:opacity-60"
           >
             {registrando ? 'Registrando...' : 'Registrar'}
           </button>

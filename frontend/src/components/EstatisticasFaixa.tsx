@@ -8,8 +8,8 @@ export interface Estatistica {
 
 const CORES = {
   padrao: 'text-brand-text',
-  amber: 'text-amber-700',
-  red: 'text-red-600',
+  amber: 'text-amber-400',
+  red: 'text-red-400',
   accent: 'text-brand-accent',
 } as const
 
@@ -22,7 +22,7 @@ export function EstatisticasFaixa({ itens }: { itens: Estatistica[] }) {
       {itens.map((item) => (
         <div key={item.rotulo} className="min-w-[160px] flex-1 shrink-0 px-5 py-4">
           <p className="text-xs uppercase tracking-wide text-brand-muted">{item.rotulo}</p>
-          <p className={`mt-1 font-display text-2xl ${CORES[item.destaque ?? 'padrao']}`}>{item.valor}</p>
+          <p className={`mt-1 text-2xl font-bold ${CORES[item.destaque ?? 'padrao']}`}>{item.valor}</p>
         </div>
       ))}
     </div>

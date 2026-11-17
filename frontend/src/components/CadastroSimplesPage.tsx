@@ -90,7 +90,7 @@ export function CadastroSimplesPage({
 
   return (
     <AppLayout>
-      <h1 className="font-display text-3xl text-brand-text">{titulo}</h1>
+      <h1 className="text-2xl font-bold tracking-tight text-brand-text">{titulo}</h1>
       <p className="mt-1 text-sm text-brand-muted">{itens.length} cadastrados</p>
 
       <form
@@ -122,13 +122,13 @@ export function CadastroSimplesPage({
         <button
           type="submit"
           disabled={salvando}
-          className="rounded-lg bg-brand-accent px-4 py-2 text-sm font-medium text-white transition hover:bg-brand-accent-hover disabled:opacity-60"
+          className="rounded-lg bg-brand-accent px-4 py-2 text-sm font-medium text-brand-accent-foreground transition hover:bg-brand-accent-hover disabled:opacity-60"
         >
           {salvando ? 'Salvando...' : '+ Adicionar'}
         </button>
       </form>
 
-      {erro && <p className="mt-3 text-sm text-red-600">{erro}</p>}
+      {erro && <p className="mt-3 text-sm text-red-400">{erro}</p>}
 
       <div className="mt-4 max-w-lg overflow-x-auto rounded-xl border border-brand-border bg-brand-surface shadow-sm">
         <table className="w-full text-left text-sm">
@@ -173,7 +173,7 @@ export function CadastroSimplesPage({
                   <td className="px-4 py-3 text-right">
                     <button
                       onClick={() => excluir(item.id)}
-                      className="inline-flex items-center gap-1 text-xs text-red-600 hover:underline"
+                      className="inline-flex items-center gap-1 text-xs text-red-400 hover:underline"
                     >
                       <Trash2 className="h-3.5 w-3.5" />
                       Excluir
