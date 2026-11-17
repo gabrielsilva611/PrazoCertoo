@@ -7,7 +7,7 @@ import { ApiError } from '../lib/api'
 const FUNCIONALIDADES = [
   { titulo: 'Cadastro de clientes', descricao: 'Relacionamento com acordos e comunicações por cliente' },
   { titulo: 'Cobrança via WhatsApp', descricao: 'Mensagens padronizadas geradas automaticamente pelo sistema' },
-  { titulo: 'Alertas automáticos', descricao: 'Notificações de vencimento sem precisar lembrar manualmente' },
+  { titulo: 'Relatórios', descricao: 'Vendas por período, inadimplência e estoque, com exportação em CSV' },
   { titulo: 'Dashboard gerencial', descricao: 'Score de clientes e indicadores do negócio em tempo real' },
 ]
 
