@@ -21,6 +21,19 @@ async function requisitar<T>(caminho: string, opcoes: RequestInit = {}): Promise
     },
   })
 
+  // 401 com token enviado = sessão expirada/inválida, não credenciais erradas
+  // (login sem token ainda cai aqui embaixo com a mensagem normal da API).
+  // Sem isso, o app ficava mostrando "Token inválido" em cada tela em vez de
+  // voltar pro login.
+  if (resposta.status === 401 && token) {
+    localStorage.removeItem('token')
+    localStorage.removeItem('usuario')
+    if (window.location.pathname !== '/login') {
+      window.location.href = '/login'
+    }
+    throw new ApiError('Sessão expirada. Faça login novamente.', 401)
+  }
+
   if (resposta.status === 204) return undefined as T
 
   const dados = await resposta.json()
