@@ -10,6 +10,7 @@ const produtoRoutes = require('./routes/produtoRoutes');
 const inventarioRoutes = require('./routes/inventarioRoutes');
 const configuracaoRoutes = require('./routes/configuracaoRoutes');
 const { tratarErros } = require('./middlewares/errorHandler');
+const { register, medirRequisicoes } = require('./lib/metrics');
 
 if (process.env.NODE_ENV === 'production' && !process.env.FRONTEND_URL) {
   throw new Error('FRONTEND_URL precisa estar configurada em produção (usada pelo CORS).');
@@ -20,8 +21,14 @@ app.disable('x-powered-by');
 
 app.use(cors({ origin: process.env.FRONTEND_URL || 'http://localhost:5173' }));
 app.use(express.json());
+app.use(medirRequisicoes);
 
 app.get('/health', (req, res) => res.json({ status: 'ok' }));
+
+app.get('/metrics', async (req, res) => {
+  res.set('Content-Type', register.contentType);
+  res.end(await register.metrics());
+});
 
 app.use('/auth', authRoutes);
 app.use('/clientes', clienteRoutes);
