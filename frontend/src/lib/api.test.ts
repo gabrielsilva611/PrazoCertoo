@@ -84,4 +84,24 @@ describe('api', () => {
     await expect(api.get('/clientes')).rejects.toBeInstanceOf(ApiError)
     await expect(api.get('/clientes')).rejects.toMatchObject({ message: 'Erro inesperado.' })
   })
+
+  it('401 sem token (ex: login com senha errada) não desloga, só propaga o erro da API', async () => {
+    globalThis.fetch = mockFetch(401, { erro: 'E-mail ou senha incorretos.' })
+
+    await expect(api.post('/auth/login', {})).rejects.toMatchObject({
+      message: 'E-mail ou senha incorretos.',
+    })
+  })
+
+  it('401 com token salvo (sessão expirada) limpa o storage e manda pro login', async () => {
+    localStorage.setItem('token', 'abc123')
+    localStorage.setItem('usuario', JSON.stringify({ nome: 'Gabriel' }))
+    globalThis.fetch = mockFetch(401, { erro: 'Token inválido ou expirado.' })
+
+    await expect(api.get('/clientes')).rejects.toMatchObject({
+      message: 'Sessão expirada. Faça login novamente.',
+    })
+    expect(localStorage.getItem('token')).toBeNull()
+    expect(localStorage.getItem('usuario')).toBeNull()
+  })
 })
