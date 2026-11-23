@@ -4,6 +4,10 @@ const scoreService = require('./scoreService');
 const AppError = require('../lib/AppError');
 const { statusParcela } = require('../lib/parcelaUtil');
 
+// Quem precisa de atenção primeiro aparece primeiro na lista — Inadimplente
+// no topo, Bom Pagador por último. Dentro do mesmo score, ordem alfabética.
+const PRIORIDADE_SCORE = { INADIMPLENTE: 0, IRREGULAR: 1, BOM_PAGADOR: 2 };
+
 // RF04, RF07: lista clientes ativos do negócio com o score calculado em tempo real.
 // As parcelas de todos os clientes são buscadas numa query só (em vez de uma
 // por cliente) e agrupadas em memória antes de calcular cada score.
@@ -25,10 +29,12 @@ async function listar(negocioId, { busca, incluirInativos } = {}) {
     parcelasPorCliente.set(parcela.venda.clienteId, doCliente);
   }
 
-  return clientes.map((cliente) => ({
-    ...cliente,
-    score: scoreService.calcularScoreDeParcelas(parcelasPorCliente.get(cliente.id) ?? [], agora),
-  }));
+  return clientes
+    .map((cliente) => ({
+      ...cliente,
+      score: scoreService.calcularScoreDeParcelas(parcelasPorCliente.get(cliente.id) ?? [], agora),
+    }))
+    .sort((a, b) => PRIORIDADE_SCORE[a.score] - PRIORIDADE_SCORE[b.score] || a.nome.localeCompare(b.nome));
 }
 
 // RF06: detalhe do cliente com score, acordos (com parcelas) e cobranças enviadas.
