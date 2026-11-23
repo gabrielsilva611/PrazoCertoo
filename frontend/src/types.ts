@@ -40,6 +40,7 @@ export interface Parcela {
   id: string
   numero: number
   valor: string
+  saldoDevedor: string
   vencimento: string
   pagoEm: string | null
   status: StatusParcela

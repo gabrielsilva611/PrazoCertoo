@@ -70,7 +70,9 @@ beforeAll(async () => {
     numParcelas: 1,
     dataInicio: diasAtras(1),
   });
-  await autenticado(request(app).patch(`/vendas/${vendaPaga.body.venda.id}/parcelas/1/pagar`));
+  await autenticado(request(app).patch(`/vendas/${vendaPaga.body.venda.id}/parcelas/1/pagar`)).send({
+    valorPago: 200,
+  });
 });
 
 afterAll(async () => {

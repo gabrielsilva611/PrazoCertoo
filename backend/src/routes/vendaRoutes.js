@@ -10,7 +10,7 @@ router.use(autenticar);
 router.get('/', vendaController.listar);
 router.get('/:id', vendaController.detalhar);
 router.post('/', vendaController.registrar);
-router.patch('/:id/parcelas/:numero/pagar', vendaController.pagarParcela);
+router.patch('/:id/parcelas/:numero/pagar', vendaController.registrarPagamento);
 router.post('/:id/parcelas/:numero/cobrar', cobrancaController.gerar);
 
 module.exports = router;

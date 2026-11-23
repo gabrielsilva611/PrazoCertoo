@@ -104,12 +104,16 @@ model Venda {
 // RF09, RF11, RF12, RN01: parcelas calculadas automaticamente; status é derivado
 // (PAGO se pagoEm != null; ATRASADO se pagoEm == null e vencimento < hoje; senão PENDENTE)
 model Parcela {
-  id         String    @id @default(uuid()) @db.Uuid
-  vendaId    String    @map("venda_id") @db.Uuid
-  numero     Int
-  valor      Decimal   @db.Decimal(10, 2)
-  vencimento DateTime  @db.Date
-  pagoEm     DateTime? @map("pago_em")
+  id           String    @id @default(uuid()) @db.Uuid
+  vendaId      String    @map("venda_id") @db.Uuid
+  numero       Int
+  valor        Decimal   @db.Decimal(10, 2)
+  // Começa igual a "valor" e vai sendo abatido a cada pagamento (que pode ser
+  // parcial, e pode incluir juros adicionados na hora). Quando chega a 0,
+  // pagoEm é preenchido — só isso já continua valendo pra status/score/dashboard.
+  saldoDevedor Decimal   @map("saldo_devedor") @db.Decimal(10, 2)
+  vencimento   DateTime  @db.Date
+  pagoEm       DateTime? @map("pago_em")
 
   venda              Venda               @relation(fields: [vendaId], references: [id])
   historicoCobrancas HistoricoCobranca[]

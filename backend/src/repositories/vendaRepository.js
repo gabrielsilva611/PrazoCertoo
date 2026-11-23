@@ -28,7 +28,9 @@ async function criarComParcelas({ venda, parcelas, movimentacaoEstoque }) {
     const vendaCriada = await tx.venda.create({ data: venda });
 
     await tx.parcela.createMany({
-      data: parcelas.map((parcela) => ({ ...parcela, vendaId: vendaCriada.id })),
+      // saldoDevedor começa igual ao valor da parcela — é o que o pagamento
+      // (mesmo que parcial) vai abatendo depois.
+      data: parcelas.map((parcela) => ({ ...parcela, saldoDevedor: parcela.valor, vendaId: vendaCriada.id })),
     });
 
     if (movimentacaoEstoque) {
@@ -82,8 +84,11 @@ function buscarParcelaComCliente(negocioId, vendaId, numero) {
   });
 }
 
-function marcarParcelaPaga(id) {
-  return prisma.parcela.update({ where: { id }, data: { pagoEm: new Date() } });
+// Atualiza o saldo depois de um pagamento (total ou parcial). Quando o
+// service calcula que o saldo chegou a 0, passa pagoEm junto — senão só o
+// saldoDevedor muda e a parcela continua em aberto.
+function registrarPagamento(id, { saldoDevedor, pagoEm }) {
+  return prisma.parcela.update({ where: { id }, data: { saldoDevedor, pagoEm } });
 }
 
 module.exports = {
@@ -92,5 +97,5 @@ module.exports = {
   criarComParcelas,
   buscarParcela,
   buscarParcelaComCliente,
-  marcarParcelaPaga,
+  registrarPagamento,
 };

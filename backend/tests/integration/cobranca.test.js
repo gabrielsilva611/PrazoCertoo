@@ -86,7 +86,9 @@ describe('POST /vendas/:id/parcelas/:numero/cobrar', () => {
       numParcelas: 1,
       dataInicio: '2026-06-05',
     });
-    await autenticado(request(app).patch(`/vendas/${venda.body.venda.id}/parcelas/1/pagar`));
+    await autenticado(request(app).patch(`/vendas/${venda.body.venda.id}/parcelas/1/pagar`)).send({
+      valorPago: 100,
+    });
 
     const resposta = await autenticado(
       request(app).post(`/vendas/${venda.body.venda.id}/parcelas/1/cobrar`),

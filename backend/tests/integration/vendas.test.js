@@ -185,19 +185,92 @@ describe('pagamento de parcelas e reflexo no score (RF11, RF12, RN02)', () => {
   });
 
   test('marca a parcela 1 como paga', async () => {
-    const resposta = await autenticado(request(app).patch(`/vendas/${vendaId}/parcelas/1/pagar`));
+    const resposta = await autenticado(request(app).patch(`/vendas/${vendaId}/parcelas/1/pagar`)).send({
+      valorPago: 100,
+    });
     expect(resposta.status).toBe(200);
     expect(resposta.body.parcela.status).toBe('PAGO');
   });
 
   test('pagar a mesma parcela de novo retorna 409', async () => {
-    const resposta = await autenticado(request(app).patch(`/vendas/${vendaId}/parcelas/1/pagar`));
+    const resposta = await autenticado(request(app).patch(`/vendas/${vendaId}/parcelas/1/pagar`)).send({
+      valorPago: 100,
+    });
     expect(resposta.status).toBe(409);
   });
 
   test('com 2 parcelas atrasadas restantes, o cliente vira IRREGULAR', async () => {
     const resposta = await autenticado(request(app).get(`/clientes/${clienteIsoladoId}`));
     expect(resposta.body.cliente.score).toBe('IRREGULAR');
+  });
+});
+
+describe('pagamento parcial e juros (RF11)', () => {
+  let clienteId;
+  let vendaId;
+
+  beforeEach(async () => {
+    const cliente = await autenticado(request(app).post('/clientes')).send({
+      nome: 'Cliente Pagamento Parcial',
+      telefone: '(47) 95555-1111',
+    });
+    clienteId = cliente.body.cliente.id;
+
+    const venda = await autenticado(request(app).post('/vendas')).send({
+      clienteId,
+      valorTotal: 100,
+      numParcelas: 1,
+      dataInicio: diasAtras(1),
+    });
+    vendaId = venda.body.venda.id;
+  });
+
+  test('pagamento parcial abate o saldo devedor e mantém a parcela em aberto', async () => {
+    const resposta = await autenticado(request(app).patch(`/vendas/${vendaId}/parcelas/1/pagar`)).send({
+      valorPago: 40,
+    });
+
+    expect(resposta.status).toBe(200);
+    expect(resposta.body.parcela.status).not.toBe('PAGO');
+    expect(Number(resposta.body.parcela.saldoDevedor)).toBe(60);
+  });
+
+  test('dois pagamentos parciais que somam o valor total quitam a parcela', async () => {
+    await autenticado(request(app).patch(`/vendas/${vendaId}/parcelas/1/pagar`)).send({ valorPago: 40 });
+    const resposta = await autenticado(request(app).patch(`/vendas/${vendaId}/parcelas/1/pagar`)).send({
+      valorPago: 60,
+    });
+
+    expect(resposta.body.parcela.status).toBe('PAGO');
+    expect(Number(resposta.body.parcela.saldoDevedor)).toBe(0);
+  });
+
+  test('juros soma sobre o saldo antes de abater o pagamento', async () => {
+    // Devia 100, +10% de juros = 110. Paga 100 -> ainda falta 10.
+    const resposta = await autenticado(request(app).patch(`/vendas/${vendaId}/parcelas/1/pagar`)).send({
+      valorPago: 100,
+      percentualJuros: 10,
+    });
+
+    expect(resposta.body.parcela.status).not.toBe('PAGO');
+    expect(Number(resposta.body.parcela.saldoDevedor)).toBe(10);
+  });
+
+  test('pagar mais do que o saldo com juros não deixa saldo negativo', async () => {
+    const resposta = await autenticado(request(app).patch(`/vendas/${vendaId}/parcelas/1/pagar`)).send({
+      valorPago: 200,
+      percentualJuros: 10,
+    });
+
+    expect(resposta.body.parcela.status).toBe('PAGO');
+    expect(Number(resposta.body.parcela.saldoDevedor)).toBe(0);
+  });
+
+  test('valorPago zero ou negativo é rejeitado (400)', async () => {
+    const resposta = await autenticado(request(app).patch(`/vendas/${vendaId}/parcelas/1/pagar`)).send({
+      valorPago: 0,
+    });
+    expect(resposta.status).toBe(400);
   });
 });
 

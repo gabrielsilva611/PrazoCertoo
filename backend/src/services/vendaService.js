@@ -62,8 +62,13 @@ async function montarMovimentacaoEstoque(negocioId, dados) {
   };
 }
 
-// RF11: registro de pagamento individual da parcela.
-async function pagarParcela(negocioId, vendaId, numero) {
+// RF11: registro de pagamento da parcela — pode ser parcial (abate do saldo
+// devedor, a parcela continua em aberto) ou total (saldo chega a 0, marca
+// pagoEm). Juros é opcional: quando informado, soma sobre o saldo ANTES de
+// abater o valor pago (ex: devia 100, juros de 5% vira 105, paga 105 = quita).
+// Tudo em centavos, igual parcelaUtil.calcularParcelas, pra não acumular erro
+// de ponto flutuante.
+async function registrarPagamento(negocioId, vendaId, numero, { valorPago, percentualJuros = 0 }) {
   const parcela = await vendaRepository.buscarParcela(negocioId, vendaId, numero);
   if (!parcela) {
     throw new AppError('Parcela não encontrada.', 404);
@@ -71,7 +76,17 @@ async function pagarParcela(negocioId, vendaId, numero) {
   if (parcela.pagoEm) {
     throw new AppError('Parcela já está paga.', 409);
   }
-  return vendaRepository.marcarParcelaPaga(parcela.id);
+
+  const saldoCentavos = Math.round(Number(parcela.saldoDevedor) * 100);
+  const jurosCentavos = Math.round(saldoCentavos * (percentualJuros / 100));
+  const valorPagoCentavos = Math.round(valorPago * 100);
+  const novoSaldoCentavos = Math.max(0, saldoCentavos + jurosCentavos - valorPagoCentavos);
+
+  const novoSaldo = novoSaldoCentavos / 100;
+  return vendaRepository.registrarPagamento(parcela.id, {
+    saldoDevedor: novoSaldo,
+    pagoEm: novoSaldo === 0 ? new Date() : null,
+  });
 }
 
 function listar(negocioId) {
@@ -86,4 +101,4 @@ async function buscarDetalhe(negocioId, id) {
   return venda;
 }
 
-module.exports = { registrar, pagarParcela, listar, buscarDetalhe };
+module.exports = { registrar, registrarPagamento, listar, buscarDetalhe };
