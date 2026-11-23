@@ -79,6 +79,36 @@ describe('clienteService.listar', () => {
     expect(clientes).toEqual([]);
     expect(parcelaRepository.listarPorClientes).not.toHaveBeenCalled();
   });
+
+  test('ordena por score — Inadimplente primeiro, Bom Pagador por último', async () => {
+    clienteRepository.listarPorNegocio.mockResolvedValue([
+      { id: 'bom', nome: 'Zeca (bom pagador)' },
+      { id: 'inadimplente', nome: 'Ana (inadimplente)' },
+      { id: 'irregular', nome: 'Bruno (irregular)' },
+    ]);
+    parcelaRepository.listarPorClientes.mockResolvedValue([
+      parcela('inadimplente', { diasAtras: 5 }),
+      parcela('inadimplente', { diasAtras: 10 }),
+      parcela('inadimplente', { diasAtras: 15 }),
+      parcela('irregular', { diasAtras: 5 }),
+    ]);
+
+    const clientes = await listar('negocio-1');
+
+    expect(clientes.map((c) => c.id)).toEqual(['inadimplente', 'irregular', 'bom']);
+  });
+
+  test('dentro do mesmo score, ordena por nome', async () => {
+    clienteRepository.listarPorNegocio.mockResolvedValue([
+      { id: 'c1', nome: 'Zeca' },
+      { id: 'c2', nome: 'Ana' },
+    ]);
+    parcelaRepository.listarPorClientes.mockResolvedValue([]);
+
+    const clientes = await listar('negocio-1');
+
+    expect(clientes.map((c) => c.nome)).toEqual(['Ana', 'Zeca']);
+  });
 });
 
 describe('clienteService.excluir', () => {
