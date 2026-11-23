@@ -14,6 +14,11 @@ const registrarSchema = z.object({
   justificativaEstoque: z.string().optional(),
 });
 
+const registrarPagamentoSchema = z.object({
+  valorPago: z.number().positive('Valor pago deve ser maior que zero.'),
+  percentualJuros: z.number().min(0, 'Juros não pode ser negativo.').max(100, 'Juros acima de 100% não faz sentido aqui.').optional(),
+});
+
 function comStatusDasParcelas(venda) {
   if (!venda.parcelas) return venda;
   return { ...venda, parcelas: venda.parcelas.map((p) => ({ ...p, status: statusParcela(p) })) };
@@ -38,10 +43,11 @@ async function detalhar(req, res) {
   res.status(200).json({ venda: comStatusDasParcelas(venda) });
 }
 
-async function pagarParcela(req, res) {
+async function registrarPagamento(req, res) {
   const numero = Number(req.params.numero);
-  const parcela = await vendaService.pagarParcela(req.usuario.negocioId, req.params.id, numero);
+  const dados = registrarPagamentoSchema.parse(req.body);
+  const parcela = await vendaService.registrarPagamento(req.usuario.negocioId, req.params.id, numero, dados);
   res.status(200).json({ parcela: { ...parcela, status: statusParcela(parcela) } });
 }
 
-module.exports = { registrar, listar, detalhar, pagarParcela };
+module.exports = { registrar, listar, detalhar, registrarPagamento };

@@ -52,7 +52,9 @@ beforeAll(async () => {
     numParcelas: 1,
     dataInicio: diasAtras(2),
   });
-  await autenticado(request(app).patch(`/vendas/${vendaPaga.body.venda.id}/parcelas/1/pagar`));
+  await autenticado(request(app).patch(`/vendas/${vendaPaga.body.venda.id}/parcelas/1/pagar`)).send({
+    valorPago: 150,
+  });
 
   // produto abaixo do estoque mínimo, pro relatório de estoque
   await autenticado(request(app).post('/produtos')).send({

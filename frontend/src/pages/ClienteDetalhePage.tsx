@@ -1,7 +1,10 @@
 import { useEffect, useState } from 'react'
 import { Link, useNavigate, useParams } from 'react-router-dom'
+import { Wallet } from 'lucide-react'
 import { AppLayout } from '../components/AppLayout'
 import { EstatisticasFaixa } from '../components/EstatisticasFaixa'
+import { Modal } from '../components/Modal'
+import { RegistrarPagamentoForm } from '../components/RegistrarPagamentoForm'
 import { ScoreBadge } from '../components/ScoreBadge'
 import { StatusParcelaBadge } from '../components/StatusParcelaBadge'
 import { useAuth } from '../AuthContext'
@@ -21,14 +24,22 @@ export function ClienteDetalhePage() {
   const [erro, setErro] = useState<string | null>(null)
   const [desativando, setDesativando] = useState(false)
   const [excluindo, setExcluindo] = useState(false)
+  const [pagamentoAberto, setPagamentoAberto] = useState<{
+    vendaId: string
+    numero: number
+    saldoDevedor: string
+    descricaoVenda: string
+  } | null>(null)
 
-  useEffect(() => {
+  function carregar() {
     api
       .get<{ cliente: ClienteDetalhe }>(`/clientes/${id}`)
       .then((resposta) => setCliente(resposta.cliente))
       .catch((e) => setErro(e instanceof ApiError ? e.message : 'Não foi possível carregar o cliente.'))
       .finally(() => setCarregando(false))
-  }, [id])
+  }
+
+  useEffect(carregar, [id])
 
   async function aoDesativar() {
     if (!window.confirm('Desativar este cliente? O histórico de vendas e cobranças é mantido.')) return
@@ -159,14 +170,16 @@ export function ClienteDetalhePage() {
                 <tr>
                   <th className="px-4 py-3 font-medium">Venda</th>
                   <th className="px-4 py-3 font-medium">Parcela</th>
+                  <th className="px-4 py-3 font-medium">Saldo devedor</th>
                   <th className="px-4 py-3 font-medium">Vencimento</th>
                   <th className="px-4 py-3 font-medium">Status</th>
+                  <th className="px-4 py-3 font-medium"></th>
                 </tr>
               </thead>
               <tbody>
                 {cliente.vendas.length === 0 && (
                   <tr>
-                    <td colSpan={4} className="px-4 py-6 text-center text-brand-muted">
+                    <td colSpan={6} className="px-4 py-6 text-center text-brand-muted">
                       Nenhuma venda registrada ainda.
                     </td>
                   </tr>
@@ -176,11 +189,36 @@ export function ClienteDetalhePage() {
                     <tr key={parcela.id} className="border-t border-brand-border">
                       <td className="px-4 py-3 text-brand-muted">{venda.descricao || '—'}</td>
                       <td className="px-4 py-3">{formatoMoeda.format(Number(parcela.valor))}</td>
+                      <td className="px-4 py-3">
+                        {parcela.status === 'PAGO' ? (
+                          <span className="text-brand-muted">—</span>
+                        ) : (
+                          formatoMoeda.format(Number(parcela.saldoDevedor))
+                        )}
+                      </td>
                       <td className="px-4 py-3 text-brand-muted">
                         {formatoData.format(new Date(parcela.vencimento))}
                       </td>
                       <td className="px-4 py-3">
                         <StatusParcelaBadge status={parcela.status} />
+                      </td>
+                      <td className="px-4 py-3 text-right">
+                        {parcela.status !== 'PAGO' && (
+                          <button
+                            onClick={() =>
+                              setPagamentoAberto({
+                                vendaId: venda.id,
+                                numero: parcela.numero,
+                                saldoDevedor: parcela.saldoDevedor,
+                                descricaoVenda: venda.descricao || `parcela ${parcela.numero}`,
+                              })
+                            }
+                            className="inline-flex items-center gap-1.5 rounded-lg bg-brand-accent px-3 py-1.5 text-xs font-medium text-brand-accent-foreground transition hover:bg-brand-accent-hover"
+                          >
+                            <Wallet className="h-3.5 w-3.5" />
+                            Registrar pagamento
+                          </button>
+                        )}
                       </td>
                     </tr>
                   )),
@@ -223,6 +261,24 @@ export function ClienteDetalhePage() {
           </div>
         </div>
       </div>
+
+      {pagamentoAberto && (
+        <Modal
+          titulo={`Registrar pagamento — ${pagamentoAberto.descricaoVenda}`}
+          onFechar={() => setPagamentoAberto(null)}
+        >
+          <RegistrarPagamentoForm
+            vendaId={pagamentoAberto.vendaId}
+            numero={pagamentoAberto.numero}
+            saldoDevedor={pagamentoAberto.saldoDevedor}
+            aoSucesso={() => {
+              setPagamentoAberto(null)
+              carregar()
+            }}
+            aoCancelar={() => setPagamentoAberto(null)}
+          />
+        </Modal>
+      )}
     </AppLayout>
   )
 }
