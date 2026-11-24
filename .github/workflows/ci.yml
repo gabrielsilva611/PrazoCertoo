@@ -94,7 +94,7 @@ jobs:
           path: frontend/coverage
 
       - name: Cache SonarQube packages
-        uses: actions/cache@0057852bfaa89a56745cba8c72965294f2c39830 # v4.3.0
+        uses: actions/cache@0057852bfaa89a56745cba8c7296529d2fc39830 # v4.3.0
         with:
           path: ~/.sonar/cache
           key: ${{ runner.os }}-sonar
