@@ -1,4 +1,4 @@
-import type { ReactNode } from 'react'
+import { useEffect, type ReactNode } from 'react'
 import { X } from 'lucide-react'
 
 interface ModalProps {
@@ -8,6 +8,14 @@ interface ModalProps {
 }
 
 export function Modal({ titulo, onFechar, children }: ModalProps) {
+  useEffect(() => {
+    function aoPressionarTecla(evento: KeyboardEvent) {
+      if (evento.key === 'Escape') onFechar()
+    }
+    document.addEventListener('keydown', aoPressionarTecla)
+    return () => document.removeEventListener('keydown', aoPressionarTecla)
+  }, [onFechar])
+
   return (
     <div
       className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-4"
