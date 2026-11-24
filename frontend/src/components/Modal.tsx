@@ -1,4 +1,4 @@
-import { useEffect, type ReactNode } from 'react'
+import { useEffect, useRef, type ReactNode } from 'react'
 import { X } from 'lucide-react'
 
 interface ModalProps {
@@ -8,24 +8,30 @@ interface ModalProps {
 }
 
 export function Modal({ titulo, onFechar, children }: ModalProps) {
+  const painelRef = useRef<HTMLDivElement>(null)
+
   useEffect(() => {
     function aoPressionarTecla(evento: KeyboardEvent) {
       if (evento.key === 'Escape') onFechar()
     }
+    function aoClicarFora(evento: MouseEvent) {
+      if (painelRef.current && !painelRef.current.contains(evento.target as Node)) onFechar()
+    }
     document.addEventListener('keydown', aoPressionarTecla)
-    return () => document.removeEventListener('keydown', aoPressionarTecla)
+    document.addEventListener('mousedown', aoClicarFora)
+    return () => {
+      document.removeEventListener('keydown', aoPressionarTecla)
+      document.removeEventListener('mousedown', aoClicarFora)
+    }
   }, [onFechar])
 
   return (
-    <div
-      className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-4"
-      onClick={onFechar}
-    >
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-4">
       <div
+        ref={painelRef}
         role="dialog"
         aria-modal="true"
         aria-label={titulo}
-        onClick={(evento) => evento.stopPropagation()}
         className="w-full max-w-md rounded-xl border border-brand-border bg-brand-surface p-6 shadow-xl"
       >
         <div className="flex items-center justify-between">
