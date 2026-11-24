@@ -7,4 +7,7 @@ module.exports = {
   // consulta é normal aqui, então o timeout padrão de 5s do Jest é curto demais
   // para testes de integração que fazem várias chamadas em sequência.
   testTimeout: 20000,
+  // lcov é o formato que o SonarCloud sabe ler.
+  collectCoverageFrom: ['src/**/*.js'],
+  coverageReporters: ['lcov', 'text'],
 };
