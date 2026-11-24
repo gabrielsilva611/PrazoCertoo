@@ -1,7 +1,7 @@
 // Deriva o tom "hover" (mais escuro) a partir da cor de destaque escolhida
 // pelo usuário, já que só guardamos uma cor — não duas.
 export function escurecer(hex: string, fator: number): string {
-  const num = parseInt(hex.slice(1), 16)
+  const num = Number.parseInt(hex.slice(1), 16)
   const r = Math.round(((num >> 16) & 0xff) * (1 - fator))
   const g = Math.round(((num >> 8) & 0xff) * (1 - fator))
   const b = Math.round((num & 0xff) * (1 - fator))
@@ -13,7 +13,7 @@ export function escurecer(hex: string, fator: number): string {
 // fixo dos botões/ícones ilegível em cima dela. Fórmula de luminância
 // percebida (ITU-R BT.601), suficiente pra decidir preto ou branco.
 export function corTextoLegivel(hex: string): string {
-  const num = parseInt(hex.slice(1), 16)
+  const num = Number.parseInt(hex.slice(1), 16)
   const r = (num >> 16) & 0xff
   const g = (num >> 8) & 0xff
   const b = num & 0xff
